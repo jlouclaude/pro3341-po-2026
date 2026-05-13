@@ -448,3 +448,210 @@ que aumentos de produção dependem exclusivamente de expansão da capacidade de
 tear, e não de contratações ou de reposição de matéria-prima.
 
 \newpage
+\subsection{Análise Preliminar}
+\label{sec:analise_r2}
+
+\subsubsection{Interpretação da Solução: Eficiência por Hora de Tear}
+
+Todos os quatro produtos têm margens de contribuição positivas, mas somente
+três atingem sua demanda máxima. Para compreender o que determina a prioridade
+de alocação no gargalo, calcula-se a eficiência de cada produto em relação ao
+recurso limitante:
+
+\begin{equation}
+  e_j = \frac{\mathrm{MC}_j}{a_{1j}} \quad \text{(R\$ por hora de tear consumida)}
+\end{equation}
+
+\begin{table}[H]
+\centering
+\caption{Eficiência de cada produto em relação ao gargalo (Teares)}
+\label{tab:efic_r2}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{$j$} & \textbf{Produto} & \textbf{MC$_j$ (R\$/lote)} & \textbf{$a_{1j}$ (h/lote)} & \textbf{$e_j$ (R\$/h)} \\
+\midrule
+1 & Sarja Barcelos  & 700  & 0,85 & \textbf{823,53} \\
+2 & Sarja Joy       & 1000 & 1,40 & \textbf{714,29} \\
+4 & Forro Premium   & 350  & 0,70 & \textbf{500,00} \\
+3 & Forro Padrão    & 220  & 0,50 & \textbf{440,00} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A ordem de prioridade no gargalo é: Barcelos $>$ Joy $>$ Forro Premium $>$
+Forro Padrão. O modelo aloca os teares seguindo exatamente essa sequência:
+satisfaz primeiro os três produtos mais eficientes até suas demandas máximas, e
+usa o tempo restante para o Forro Padrão, que apresenta a menor eficiência por
+hora de tear. Esse resultado é coerente com o Passo~2 do processo de melhoria
+contínua da TOC \cite{sobreiro2013}: explorar o gargalo alocando sua capacidade
+prioritariamente aos produtos que geram mais margem por hora consumida.
+
+Note-se um ponto contraintuitivo: a Sarja Joy tem a maior margem unitária
+absoluta (R\$\,1.000/lote), mas não ocupa o primeiro lugar em eficiência por
+hora de tear. É a Sarja Barcelos, com margem unitária menor (R\$\,700/lote),
+que lidera em eficiência graças ao seu menor tempo de processo. Isso evidencia
+que a tomada de decisão com base apenas na margem unitária -- sem considerar o
+consumo do recurso limitante -- pode levar a priorizações equivocadas.
+
+\subsubsection{Preços-Sombra}
+
+O preço-sombra mede o incremento em $Z^*$ obtido pela disponibilização de uma
+unidade adicional de capacidade do recurso, mantidos os demais parâmetros
+constantes \cite{winston2002}.
+
+\begin{table}[H]
+\centering
+\caption{Preços-sombra dos recursos produtivos}
+\label{tab:pi_r2}
+\begin{tabular}{lrrl}
+\toprule
+\textbf{Recurso} & \textbf{Folga} & \textbf{Preço-sombra ($\pi_i$)} & \textbf{Interpretação} \\
+\midrule
+Teares (h)          &    0,0  & \textbf{R\$ 440,00/h} & Gargalo: cada hora a mais vale R\$\,440 \\
+Fio algodão (kg)    &   54,0  & R\$ 0,00/kg  & Não gargalo \\
+Fio poliéster (kg)  &  199,8  & R\$ 0,00/kg  & Não gargalo \\
+Elastano (kg)       &    1,6  & R\$ 0,00/kg  & Não gargalo \\
+Mão de obra (h)     & 1.019,0 & R\$ 0,00/h   & Abundante \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Somente os Teares têm preço-sombra positivo (R\$\,440,00/h). Na prática, isso
+significa que uma hora extra de tear por semana -- cujo custo adicional, contando
+acréscimos de NR e benefícios, é estimado em R\$\,30--50/h -- gera R\$\,440 de
+margem de contribuição adicional, representando um retorno de 9 a 15 vezes sobre
+o custo incremental.
+
+\subsubsection{Análise de Sensibilidade Preliminar -- Ranging do RHS dos Teares}
+
+A Tabela~\ref{tab:rang_tear} mostra o impacto de variações na capacidade dos
+teares sobre a margem de contribuição total.
+
+\begin{table}[H]
+\centering
+\caption{Impacto da variação de capacidade dos Teares sobre $Z^*$}
+\label{tab:rang_tear}
+\begin{tabular}{rrrr}
+\toprule
+\textbf{Teares (h)} & \textbf{Variação} & \textbf{$Z^*$ (R\$)} & \textbf{$\Delta Z$ (R\$)} \\
+\midrule
+300 & $-80$ h & 221.628,57 &  $-44.011,43$ \\
+320 & $-60$ h & 235.914,29 &  $-29.725,71$ \\
+340 & $-40$ h & 247.200,00 &  $-18.440,00$ \\
+360 & $-20$ h & 256.840,00 &   $-8.800,00$ \\
+\textbf{380} & \textbf{(base)} & \textbf{265.640,00} & \textbf{---} \\
+400 & $+20$ h & 274.440,00 &   $+8.800,00$ \\
+420 & $+40$ h & 276.200,00 &  $+10.560,00$ \\
+440 & $+60$ h & 276.200,00 &  $+10.560,00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Dois comportamentos merecem atenção. Primeiro, o preço-sombra de R\$\,440/h é
+válido apenas no intervalo de capacidade entre aproximadamente 320~h e 420~h de
+tear. Abaixo de 320~h, a restrição de demanda mínima dos forros (contratos)
+passa a dominar e o preço-sombra aumenta. Acima de 420~h, a demanda máxima da
+Sarja Joy (80 lotes) e da Sarja Barcelos (200 lotes) já estão plenamente
+atendidas e o aumento de capacidade não gera mais ganho -- a base ótima muda e
+o $Z^*$ estabiliza em R\$\,276.200,00.
+
+Segundo, há uma assimetria entre reduções e acréscimos de capacidade: uma redução
+de 20~h provoca uma queda de R\$\,8.800 em $Z^*$, enquanto um acréscimo de 20~h
+eleva $Z^*$ em R\$\,8.800 também, porém a partir de 420~h o ganho marginal cai
+para zero. Isso indica que o limite superior do intervalo de rentabilidade das
+horas extras está próximo da capacidade atual.
+
+\subsubsection{Ranging dos Coeficientes da Função Objetivo}
+
+O Forro Padrão é o único produto que não atinge sua demanda máxima. Isso levanta
+a questão: qual MC mínima faria com que o modelo passasse a produzir 160 lotes de
+Forro Padrão? A análise computacional mostra que o Forro Padrão atingiria sua
+demanda máxima se sua MC fosse elevada a pelo menos R\$\,250/lote, um aumento de
+R\$\,30/lote (13,6\%) em relação ao valor atual de R\$\,220/lote. Esse aumento
+poderia ser alcançado por meio de reajuste de preço de venda com os clientes
+contratuais ou de redução do custo do fio de poliéster (que representa
+aproximadamente 38\% do custo variável do forro).
+
+\subsubsection{Comparação com o Plano Atual}
+
+Com base nas informações coletadas na visita técnica, o plano de produção
+praticado pela Rentex em março de 2026 era:
+
+\begin{table}[H]
+\centering
+\caption{Comparação entre o plano atual da Rentex e o plano ótimo do modelo}
+\label{tab:comp_r2}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{$j$} & \textbf{Produto} & \textbf{Plano atual} & \textbf{Plano ótimo} & \textbf{Diferença} \\
+\midrule
+1 & Sarja Barcelos  &  90 & 200 & $+110$ \\
+2 & Sarja Joy       &  30 &  80 &  $+50$ \\
+3 & Forro Padrão    & 140 & 112 &  $-28$ \\
+4 & Forro Premium   &  30 &  60 &  $+30$ \\
+\midrule
+\multicolumn{2}{l}{\textbf{MC total (R\$/semana)}} & \textbf{147.400} & \textbf{265.640} & $\mathbf{+118.240}$ \\
+\multicolumn{2}{l}{\textbf{Horas de tear utilizadas}} & \textbf{264,5 h} & \textbf{380,0 h} & $+115,5$ h \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Plano atual: informado pela equipe de PCP com base no relatório de produção de março/2026.}
+\end{tabular}
+\end{table}
+
+A diferença de R\$\,118.240 por semana entre os dois planos (80,2\% de ganho
+potencial) tem dois componentes distintos:
+
+\begin{enumerate}[label=\textbf{(\alph*)}]
+  \item \textbf{Subutilização de capacidade:} o plano atual utiliza apenas
+        264,5~h dos 380~h disponíveis nos teares (69,6\% de ocupação). As 115,5~h
+        ociosas representam, ao preço-sombra de R\$\,440/h, um potencial de
+        R\$\,50.820 de margem de contribuição não realizada por semana.
+
+  \item \textbf{Mix subótimo:} mesmo com a capacidade atual, a alocação das
+        horas utilizadas privilegia o Forro Padrão (produto de menor eficiência
+        por hora de tear) em detrimento das sarjas (produtos de maior eficiência).
+        Reduzindo 28 lotes de Forro Padrão e realocando para Sarja Barcelos (+110)
+        e Sarja Joy (+50), obtém-se o ganho restante.
+\end{enumerate}
+
+Essa decomposição será aprofundada no Relatório 3, com dados de sistema
+formalmente validados pela empresa.
+
+\subsubsection{Verificação: PL Contínua vs.\ Programação Linear Inteira}
+
+Para confirmar que a hipótese de divisibilidade é adequada, o modelo foi resolvido
+também com variáveis inteiras (PLI). O resultado é idêntico ($Z^* =
+\text{R\$}~265.640,00$), pois todos os valores da solução ótima contínua são
+inteiros para este conjunto de parâmetros. O gap é de exatamente 0,00\%, o que
+elimina qualquer dúvida sobre a adequação da formulação contínua.
+
+\subsection{Limitações e Próximas Etapas}
+
+Os resultados deste relatório estão sujeitos a quatro limitações que serão
+endereçadas no Relatório 3:
+
+\begin{enumerate}[label=\textbf{(\roman*)}]
+  \item \textbf{Dados do plano atual:} os valores do plano praticado pela Rentex
+        (Tabela~\ref{tab:comp_r2}) foram fornecidos verbalmente pela equipe de
+        PCP. No Relatório 3, esses valores serão confrontados com os registros
+        formais do sistema de gestão.
+
+  \item \textbf{Horizonte único:} o modelo é estático (uma semana) e não captura
+        variações sazonais de demanda ou efeitos de formação de estoque. Uma
+        análise de robustez com diferentes cenários de demanda será apresentada.
+
+  \item \textbf{Setup explícito:} o tempo de setup foi incorporado ao coeficiente
+        de tear de forma agregada. Em situações com muitas trocas na mesma semana,
+        o custo real pode ser maior. O Relatório 3 avaliará a sensibilidade da
+        solução ao parâmetro de setup.
+
+  \item \textbf{Contratos mínimos fixos:} as demandas mínimas contratuais foram
+        tratadas como parâmetros fixos. A análise de sensibilidade do Relatório 3
+        investigará como variações nesses valores afetam a margem de contribuição,
+        subsidiando eventuais renegociações com clientes.
+\end{enumerate}
+
+O Relatório 3 apresentará a análise de sensibilidade completa com intervalos
+exatos de ranging, a comparação formal com a metodologia atual a partir de dados
+de sistema e recomendações concretas para a gestão da Rentex.
+
+\newpage
