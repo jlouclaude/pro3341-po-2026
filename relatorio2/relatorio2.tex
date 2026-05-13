@@ -130,3 +130,141 @@ A PLI será utilizada como análise complementar para avaliar o impacto da
 hipótese de divisibilidade, conforme anunciado no Relatório 1.
 
 \newpage
+%==============================================================================
+\subsection{Coleta e Validação dos Dados}
+%==============================================================================
+
+Esta seção descreve o processo de levantamento e refinamento dos dados utilizados
+na formulação final do modelo, realizado em duas visitas técnicas à planta da
+Rentex em março de 2026.
+
+\subsubsection{Fontes de Dados}
+
+Os dados foram obtidos a partir de três fontes complementares:
+
+\begin{enumerate}[label=\textbf{(\roman*)}]
+  \item \textbf{Sistema ERP da empresa (módulo PCP):} roteiros de fabricação com
+        tempos padrão por operação, por produto e por máquina, expressos em
+        horas por lote de 100 metros lineares.
+
+  \item \textbf{Relatórios mensais de capacidade:} histórico de março de 2025 a
+        fevereiro de 2026, utilizados para calcular a disponibilidade semanal média
+        de cada recurso após descontar manutenções programadas e tempos de setup.
+
+  \item \textbf{Planilhas de custo de produto:} fichas de custo elaboradas pelo
+        departamento financeiro, com discriminação de matéria-prima (fio, corantes,
+        auxiliares químicos), mão de obra direta e custos variáveis de utilidade
+        (energia, vapor, água).
+\end{enumerate}
+
+\subsubsection{Capacidades Disponíveis Validadas}
+
+A disponibilidade semanal de cada recurso foi calculada como a média das últimas
+12 semanas completas de operação, descontando paradas programadas. O regime de
+trabalho é de segunda a sábado em dois turnos de 8 horas, com 30 minutos de
+pausa por turno. A Tabela~\ref{tab:cap_valid} apresenta os valores obtidos.
+
+\begin{table}[H]
+\centering
+\caption{Capacidades semanais disponíveis validadas}
+\label{tab:cap_valid}
+\begin{tabular}{clccc}
+\toprule
+\textbf{$i$} & \textbf{Recurso} & \textbf{Capacidade bruta} & \textbf{Eficiência} & \textbf{$b_i$ (disponível)} \\
+\midrule
+1 & Teares (h)               & 1.344 h & 88\% & 1.183 h \\
+2 & Tinturaria (h)           &   864 h & 90\% &   778 h \\
+3 & Acabamento (h)           &   672 h & 85\% &   571 h \\
+4 & Matéria-prima -- fio (kg)& 16.000 kg & 100\% & 16.000 kg \\
+5 & Mão de obra direta (h)   &   960 h & 93\% &   893 h \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Eficiência = fração do tempo bruto efetivamente disponível após setups, manutenções e absenteísmo.}
+\end{tabular}
+\end{table}
+
+Para fins de modelagem, os valores de $b_i$ foram arredondados de forma
+conservadora (para baixo), resultando nos limites definitivos usados no modelo:
+$b_1 = 1.180$~h, $b_2 = 775$~h, $b_3 = 570$~h, $b_4 = 16.000$~kg e
+$b_5 = 890$~h.
+
+\subsubsection{Coeficientes de Consumo Validados}
+
+Os tempos padrão por operação foram extraídos dos roteiros de fabricação do ERP
+e conferidos por cronometragem direta em linha durante a segunda visita técnica.
+A Tabela~\ref{tab:coef_valid} apresenta os coeficientes finais $a_{ij}$.
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes técnicos validados: consumo de recurso $i$ por lote do produto $j$ ($a_{ij}$)}
+\label{tab:coef_valid}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Recurso $i$} & \textbf{Jersey} & \textbf{Rib} & \textbf{Popeline} & \textbf{Oxford} & \textbf{Denim} & \textbf{Técnico} \\
+\midrule
+Teares (h/lote)        & 1,8 & 2,3 & 2,9 & 3,4 & 4,1 & 3,6 \\
+Tinturaria (h/lote)    & 1,4 & 1,6 & 1,9 & 2,4 & 2,9 & 1,1 \\
+Acabamento (h/lote)    & 0,7 & 0,9 & 1,1 & 1,3 & 1,7 & 2,6 \\
+Fio (kg/lote)          & 17  & 21  & 24  & 29  & 36  & 27  \\
+MOD (h/lote)           & 1,1 & 1,4 & 1,7 & 1,9 & 2,4 & 2,9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As diferenças em relação às estimativas do Relatório 1 são pequenas (inferiores
+a 5\% em todos os casos), o que valida a consistência do levantamento inicial.
+A maior variação ocorreu no coeficiente de acabamento do Tecido Técnico
+($a_{3,6}$: 2,5~h/lote estimado vs.\ 2,6~h/lote medido), confirmando que o
+acabamento é de fato o recurso mais restritivo para esse produto.
+
+\subsubsection{Margens de Contribuição Validadas}
+
+A Tabela~\ref{tab:mc_valid} apresenta as margens de contribuição por lote,
+calculadas com base nos preços de tabela praticados em março de 2026 e nas
+fichas de custo variável fornecidas pelo departamento financeiro.
+
+\begin{table}[H]
+\centering
+\caption{Preços, custos variáveis e margens de contribuição por lote (100~m)}
+\label{tab:mc_valid}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Produto} & \textbf{Preço (R\$/lote)} & \textbf{CV (R\$/lote)} & \textbf{MC$_j$ (R\$/lote)} \\
+\midrule
+Malha Jersey    & 275 & 178 &  97 \\
+Malha Rib       & 315 & 196 & 119 \\
+Plano Popeline  & 345 & 218 & 127 \\
+Plano Oxford    & 415 & 255 & 160 \\
+Denim Leve      & 475 & 295 & 180 \\
+Tecido Técnico  & 575 & 352 & 223 \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize CV = matéria-prima + corantes + energia + MOD (custo variável total).}
+\end{tabular}
+\end{table}
+
+\subsubsection{Demandas Semanais Validadas}
+
+Os limites de demanda foram calibrados com base na média semanal da carteira de
+pedidos firmes dos últimos dois meses e no histórico de pedidos não atendidos por
+falta de capacidade. A Tabela~\ref{tab:dem_valid} apresenta os valores utilizados.
+
+\begin{table}[H]
+\centering
+\caption{Demandas semanais máximas validadas ($d_j$, em lotes de 100~m)}
+\label{tab:dem_valid}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Produto} & \textbf{Demanda média (lotes/sem)} & \textbf{$d_j$ utilizado no modelo} \\
+\midrule
+Malha Jersey    & 185 & 195 \\
+Malha Rib       & 140 & 148 \\
+Plano Popeline  & 112 & 118 \\
+Plano Oxford    &  93 &  98 \\
+Denim Leve      &  74 &  78 \\
+Tecido Técnico  &  55 &  58 \\
+\bottomrule
+\multicolumn{3}{l}{\footnotesize $d_j$ = demanda média + margem de 5\% para atender pedidos spot.}
+\end{tabular}
+\end{table}
+
+\newpage
