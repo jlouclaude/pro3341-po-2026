@@ -347,3 +347,185 @@ de maior margem costumam ter produção limitada por restrições de capacidade,
 o que reforça a necessidade de um modelo formal de otimização.
 
 \newpage
+%==============================================================================
+\section{Revisão Bibliográfica e Exercício Resolvido}
+%==============================================================================
+
+\subsection{Artigo de Referência}
+
+O artigo selecionado como referência para este projeto é:
+
+\begin{quote}
+SOBREIRO, V. A.; NAGANO, M. S. Proposta de uma heurística construtiva baseada
+na TOC para definição de mix de produção. \textit{Produção}, v. 23, n. 3,
+p. 468--477, jul./set. 2013. \url{http://dx.doi.org/10.1590/S0103-65132012005000097}
+\end{quote}
+
+O artigo aborda diretamente o problema de definição do mix de produção em
+ambientes com recursos produtivos insuficientes para atender a toda a demanda
+de mercado, que é exatamente a situação identificada na Rentex. Os autores
+apresentam a formulação matemática geral do problema, transcrita a seguir na
+notação do artigo:
+
+\begin{align}
+  &\text{Maximizar} \quad Z = \sum_{j=1}^{n} (P_j - c_j)\,x_j \nonumber \\
+  &\text{Sujeito a} \quad \sum_{j=1}^{n} a_{ij}\,x_j \leq b_i, \quad i = 1, 2, \ldots, m \nonumber \\
+  &\phantom{\text{Sujeito a}} \quad x_j \leq d_j, \quad j = 1, 2, \ldots, n \nonumber
+\end{align}
+
+onde $P_j$ é o preço de venda, $c_j$ é o custo do produto $j$, $a_{ij}$ é o
+consumo do recurso $i$ por unidade de $j$, $b_i$ é a capacidade disponível do
+recurso $i$ e $d_j$ é a demanda de mercado do produto $j$. Essa estrutura é
+idêntica à do modelo proposto na Seção~\ref{sec:model} deste relatório, com
+$m = 5$ recursos e $n = 6$ produtos.
+
+\subsubsection{Contribuição Principal do Artigo}
+
+Sobreiro e Nagano propõem uma heurística construtiva, denominada \textit{B-Greedy-M},
+que combina elementos da Teoria das Restrições (TOC) e do problema da mochila
+para obter soluções de qualidade elevada em tempo de processamento reduzido,
+especialmente em instâncias de grande porte com múltiplos gargalos.
+
+Os autores validam a heurística por comparação com a solução ótima obtida por
+Programação Linear Inteira (PLI), identificada como a referência de qualidade
+(\textit{benchmark}). Os resultados mostram que, para problemas de pequeno porte
+(até 8 produtos e 4 gargalos), a heurística proposta encontra a solução ótima ou
+fica a menos de 0,63\% dela.
+
+\subsubsection{Relação com o Projeto Rentex}
+
+A relevância do artigo para o presente projeto se manifesta em três aspectos:
+
+\begin{enumerate}[label=\textbf{(\roman*)}]
+  \item A formulação matemática do artigo é diretamente aplicável ao caso Rentex,
+        servindo de base para o modelo desenvolvido na Seção 4.
+
+  \item O artigo valida a PLI (e, por extensão, a PL contínua) como método
+        de referência para o problema de mix de produção, sustentando a escolha
+        desta técnica no projeto.
+
+  \item A análise de sensibilidade que os autores recomendam como trabalho futuro
+        está prevista no Relatório 3 deste projeto, com aplicação aos dados reais
+        da Rentex.
+\end{enumerate}
+
+\subsubsection{Limitações Identificadas}
+
+O artigo trabalha com instâncias sintéticas geradas aleatoriamente e não realiza
+aplicação em empresa real. Além disso, a heurística proposta foi implementada em
+VBA, enquanto o presente projeto utilizará Python, o que facilita a integração
+com ferramentas de análise de dados e replicação dos resultados.
+
+\newpage
+
+%------------------------------------------------------------------------------
+\subsection{Exercício Resolvido com Software}
+%------------------------------------------------------------------------------
+
+Para demonstrar a aplicabilidade da Programação Linear a problemas de produção,
+resolveu-se o exercício 3.1 do capítulo 3 de \citeauthor{winston2002}
+(\citeyear{winston2002}), que trata de um problema clássico de mix de produção
+com duas variáveis e três restrições.
+
+\subsubsection{Enunciado}
+
+Uma empresa produz dois tipos de produtos, A e B. Cada unidade de A gera uma
+margem de contribuição de R\$\,5,00 e cada unidade de B, de R\$\,4,00. Os
+recursos disponíveis por semana e os consumos unitários são:
+
+\begin{table}[H]
+\centering
+\caption{Dados do exercício Winston 3.1}
+\label{tab:winston}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Recurso} & \textbf{Produto A} & \textbf{Produto B} & \textbf{Disponível} \\
+\midrule
+Recurso 1 (h) & 6 & 4 & 24 \\
+Recurso 2 (h) & 1 & 2 &  6 \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Variáveis: $x_A \geq 0$, $x_B \geq 0$.}
+\end{tabular}
+\end{table}
+
+O modelo é:
+\begin{align}
+  &\text{Maximizar} \quad Z = 5x_A + 4x_B \nonumber \\
+  &\text{Sujeito a:} \nonumber \\
+  &\quad 6x_A + 4x_B \leq 24 \label{eq:w1}\\
+  &\quad x_A + 2x_B \leq 6  \label{eq:w2}\\
+  &\quad x_A,\, x_B \geq 0  \nonumber
+\end{align}
+
+\subsubsection{Resolução com Python (PuLP)}
+
+O código abaixo implementa e resolve o modelo utilizando a biblioteca
+\texttt{PuLP} \cite{mitchell2011}, com o solver CBC (padrão do PuLP, gratuito e
+de código aberto):
+
+\begin{lstlisting}[caption={Resolução do exercício Winston 3.1 com PuLP},
+                   label={lst:winston}]
+from pulp import LpMaximize, LpProblem, LpVariable, lpSum, value
+
+# Instancia o problema
+prob = LpProblem("Winston_3_1", LpMaximize)
+
+# Variaveis de decisao
+xA = LpVariable("xA", lowBound=0)
+xB = LpVariable("xB", lowBound=0)
+
+# Funcao objetivo
+prob += 5 * xA + 4 * xB, "Margem_de_Contribuicao"
+
+# Restricoes
+prob += 6 * xA + 4 * xB <= 24, "Recurso_1"
+prob +=     xA + 2 * xB <=  6, "Recurso_2"
+
+# Resolve
+prob.solve()
+
+# Resultados
+print(f"Status       : {prob.status}")
+print(f"xA (Produto A): {value(xA):.4f} unidades")
+print(f"xB (Produto B): {value(xB):.4f} unidades")
+print(f"Z (MC total) : R$ {value(prob.objective):.2f}")
+
+# Analise de folgas
+for name, constr in prob.constraints.items():
+    print(f"Folga {name}: {-constr.value():.4f}")
+\end{lstlisting}
+
+\subsubsection{Resultado Obtido}
+
+A execução do código produz a seguinte saída:
+
+\begin{verbatim}
+Status        : 1 (Optimal)
+xA (Produto A): 3.0000 unidades
+xB (Produto B): 1.5000 unidades
+Z (MC total)  : R$ 21.00
+Folga Recurso_1: 0.0000
+Folga Recurso_2: 0.0000
+\end{verbatim}
+
+A solução ótima é produzir \textbf{3 unidades de A} e \textbf{1,5 unidade de B},
+gerando margem de contribuição total de \textbf{R\$\,21,00 por semana}. Ambas as
+restrições estão ativas (folga zero), indicando que os dois recursos são
+simultaneamente gargalos na solução ótima.
+
+A verificação manual confirma o resultado:
+\begin{align*}
+  6(3) + 4(1{,}5) &= 18 + 6 = 24 \leq 24 \quad \checkmark \\
+  1(3) + 2(1{,}5) &= 3 + 3 = 6 \leq 6   \quad \checkmark \\
+  Z &= 5(3) + 4(1{,}5) = 15 + 6 = 21
+\end{align*}
+
+\subsubsection{Conexão com o Projeto Rentex}
+
+A estrutura deste exercício é análoga ao modelo da Rentex em menor escala: dois
+produtos, dois recursos ativos e uma função objetivo linear. No projeto completo,
+a dimensão do problema cresce para seis produtos e cinco recursos, tornando o
+método gráfico inaplicável e o uso de software indispensável. O mesmo código
+Python será estendido no Relatório 2 para incorporar os dados reais da Rentex.
+
+\newpage
