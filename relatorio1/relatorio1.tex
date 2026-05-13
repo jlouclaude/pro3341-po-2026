@@ -196,7 +196,7 @@ após levantamento de dados com a empresa.
 
 \newpage
 %==============================================================================
-\section{Concepção da Modelagem}
+\section{Concepção da Modelagem}\label{sec:model}
 %==============================================================================
 
 Esta seção apresenta a formulação preliminar do modelo de Programação Linear
@@ -529,3 +529,106 @@ método gráfico inaplicável e o uso de software indispensável. O mesmo códig
 Python será estendido no Relatório 2 para incorporar os dados reais da Rentex.
 
 \newpage
+%==============================================================================
+\section{Considerações sobre a Viabilidade do Projeto}
+%==============================================================================
+
+\subsection{Disponibilidade de Dados}
+
+A Rentex confirmou, por meio de seu Diretor de Novos Negócios, a disponibilidade
+dos seguintes dados para as fases seguintes do projeto:
+
+\begin{itemize}
+  \item Roteiros de fabricação com tempos de operação por produto e por setor,
+        extraídos do sistema de controle de produção da empresa.
+  \item Relatórios de capacidade mensal dos setores de teares, tinturaria,
+        acabamento e expedição.
+  \item Histórico de pedidos dos últimos 12 meses, com volumes por SKU e
+        preços praticados, utilizado para calibrar os limites de demanda.
+  \item Fichas de custo de produto com discriminação de matéria-prima, mão de
+        obra direta e custos variáveis de processo.
+\end{itemize}
+
+O levantamento detalhado está programado para as semanas seguintes à entrega
+deste relatório, em visita ao parque fabril acompanhada pelo responsável do setor
+de Planejamento e Controle da Produção (PCP).
+
+\subsection{Cronograma do Projeto}
+
+\begin{table}[H]
+\centering
+\caption{Cronograma previsto para o projeto}
+\label{tab:cronograma}
+\begin{tabular}{clc}
+\toprule
+\textbf{Relatório} & \textbf{Conteúdo} & \textbf{Entrega} \\
+\midrule
+1\textordmasculine & Empresa, problema, modelagem conceitual, artigo e exercício & 24/03/2026 \\
+2\textordmasculine & Formulação final, dados validados, primeiros resultados       & 13/05/2026 \\
+3\textordmasculine & Resultados finais, comparação, análise de sensibilidade        & 10/06/2026 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Softwares a Utilizar}
+
+O projeto utilizará os seguintes softwares:
+
+\begin{itemize}
+  \item \textbf{Python 3.11} com a biblioteca \texttt{PuLP} e o solver CBC para
+        resolução do modelo de PL.
+  \item \textbf{Gurobi} (licença acadêmica USP) como solver alternativo de alto
+        desempenho para análise de sensibilidade e testes de robustez.
+  \item \textbf{Jupyter Notebook} para documentação dos experimentos
+        computacionais a serem incluídos no Relatório 2.
+\end{itemize}
+
+\subsection{Anexos}
+
+O Anexo A contém a carta de aprovação assinada por Pedro Charmillot Silva,
+Diretor de Novos Negócios da Rentex Indústria Têxtil LTDA, autorizando a
+realização do projeto.
+
+O Anexo B contém o artigo de Sobreiro e Nagano (2013) na íntegra.
+
+\newpage
+
+%==============================================================================
+%  ANEXOS
+%==============================================================================
+\appendix
+
+\section{Carta de Aprovação da Empresa}
+\label{anx:carta}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{relatorio1/carta_empresa.pdf}
+\caption{Carta de aprovação emitida pela Rentex Indústria Têxtil LTDA}
+\label{fig:carta}
+\end{figure}
+
+\newpage
+
+\section{Artigo de Referência}
+\label{anx:artigo}
+
+\includegraphics[width=\textwidth, page=1]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=2]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=3]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=4]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=5]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=6]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=7]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=8]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=9]{relatorio1/artigo_referencia.pdf}
+\newpage
+\includegraphics[width=\textwidth, page=10]{relatorio1/artigo_referencia.pdf}
