@@ -6,38 +6,29 @@
 
 \subsection{Introdução}
 
-Este relatório apresenta a segunda etapa do projeto. Com base na concepção
-do Relatório 1, são apresentados: a revisão bibliográfica que fundamenta a
-técnica, a formulação matemática completa e aprimorada do modelo de
-Programação Linear para o problema de mix de produção da Rentex, e os
-primeiros resultados computacionais com análise preliminar.
+O Relatório~1 apresentou a concepção do problema e a estrutura conceitual do
+modelo, mas recebeu duas observações do monitor da disciplina, Lauro Solia.
+Primeiro, um modelo com demanda mínima contratual como restrição dura produziria
+um resultado previsível por inspeção -- o Simplex alocaria toda a capacidade às
+sarjas e produziria o mínimo dos forros -- o que dispensaria o uso de
+Programação Linear. Segundo, o artigo de referência havia sido anexado sem
+nenhuma discussão sobre sua metodologia.
 
-A formulação foi aprimorada em relação à concepção inicial a partir das
-observações do monitor da disciplina, Lauro Solia, que identificou dois pontos
-centrais no Relatório 1: (i) um modelo com apenas demanda mínima contratual como
-restrição dura produziria um resultado trivialmente previsível por inspeção,
-dispensando o uso de Programação Linear; e (ii) o artigo de referência havia sido
-anexado sem discussão sobre sua metodologia e conexão com o projeto. Ambos os
-pontos foram endereçados neste relatório.
-
-A reformulação captura o elemento central do problema: o \textbf{trade-off entre
-maximizar margem de contribuição no curto prazo e manter parcerias de longo prazo
-com clientes contratuais de menor margem}. Esse elemento distingue o problema da
-Rentex de um simples problema de alocação, tornando o uso de Programação Linear
-genuinamente necessário para derivar a política ótima.
+Ambas as observações foram incorporadas neste relatório. O modelo foi reformulado
+para capturar o trade-off entre margem de contribuição imediata e manutenção de
+parcerias de longo prazo, tornando o problema genuinamente não trivial. O artigo
+de Sobreiro e Nagano é discutido em detalhe, com explicitação do que sua
+metodologia oferece e do que este projeto adota ou estende.
 
 \newpage
 
 \subsection{Conexão com o Artigo de Referência}
 
-O artigo de \textcite{sobreiro2013}, ``Proposta de uma heurística construtiva
-baseada na TOC para definição de mix de produção'', publicado na revista
-\textit{Produção} (Qualis A2), é diretamente aplicável ao problema da Rentex.
-Esta seção explicita as conexões e o que da metodologia do artigo será utilizado.
-
-\subsubsection{Paralelo entre o Artigo e o Problema Rentex}
-
-O problema tratado por \textcite{sobreiro2013} é, na sua forma geral:
+O artigo de \textcite{sobreiro2013}, publicado na revista \textit{Produção}
+(Qualis A2), trata exatamente da classe de problemas da Rentex: múltiplos
+produtos competindo por recursos produtivos com capacidade insuficiente para
+atender toda a demanda, com objetivo de maximizar o ganho total. A formulação
+geral apresentada pelos autores é:
 
 \begin{align}
   &\text{Maximizar} \quad Z = \sum_{j=1}^{n} (P_j - c_j)\, x_j \nonumber \\
@@ -45,113 +36,91 @@ O problema tratado por \textcite{sobreiro2013} é, na sua forma geral:
   &\phantom{\text{s.a.}} \quad x_j \leq d_j, \quad j = 1, \ldots, n \nonumber
 \end{align}
 
-A estrutura é idêntica ao caso Rentex: maximizar a soma das margens de contribuição
-sujeita a restrições de capacidade dos recursos e limites de demanda. O problema
-da Rentex adiciona restrições de demanda mínima contratual e variáveis de
-penalidade por subatendimento, conforme detalhado na seção de formulação.
+A estrutura é idêntica ao modelo deste projeto: maximizar margens de contribuição
+sujeito a restrições de capacidade e demanda. O caso Rentex adiciona demandas
+mínimas contratuais e variáveis de penalidade por subatendimento, estendendo
+a formulação do artigo para capturar o valor das relações comerciais de longo prazo.
 
-\subsubsection{O que o Artigo Usa e o que Este Trabalho Adota}
+\subsubsection{O que o Artigo Propõe e o que Este Trabalho Adota}
 
-\textcite{sobreiro2013} propõem uma \textbf{heurística construtiva} baseada em
-dois elementos: (i) a Teoria das Restrições (TOC), para identificar o recurso
-gargalo e ordenar produtos por eficiência no gargalo; e (ii) o problema da
-mochila (\textit{knapsack}), para alocar a capacidade disponível de forma gulosa.
-O artigo compara sua heurística com a \textbf{solução ótima da Programação Linear
-Inteira (PLI)}, que é adotada como referência (\textit{benchmark}).
+\textcite{sobreiro2013} propõem uma heurística construtiva que combina dois
+elementos: a Teoria das Restrições (TOC), para identificar o recurso gargalo
+e ordenar os produtos por eficiência nele; e o problema da mochila
+(\textit{knapsack}), para alocar a capacidade disponível de forma gulosa. O
+artigo valida a heurística comparando seus resultados com a solução ótima da
+Programação Linear Inteira (PLI), adotada como referência (\textit{benchmark}).
 
-Este projeto adota uma abordagem diferente e complementar:
+Este projeto segue um caminho diferente e complementar ao do artigo. O índice
+de eficiência $R_i = \mathrm{CM}_i / t_{i,\mathrm{BN}_k}$ proposto pelos autores
+é usado aqui para interpretar a solução ótima e explicar a priorização dos
+produtos. Como o problema tem apenas 4 produtos e 5 recursos, a PL encontra
+o ótimo global em fração de segundo, tornando a heurística desnecessária. O
+projeto opera, portanto, no mesmo patamar de referência que o artigo usa como
+\textit{benchmark}.
 
-\begin{enumerate}[label=\textbf{(\roman*)}]
-  \item \textbf{Identificação do gargalo via TOC} (do artigo): a análise da
-        eficiência por hora de tear de cada produto -- análoga ao índice
-        $R_i = \mathrm{CM}_i / t_{i,\mathrm{BN}_k}$ do artigo -- é usada para
-        interpretar a solução ótima e explicar por que certos produtos são
-        priorizados.
-
-  \item \textbf{PL como solução exata} (em vez da heurística): como o problema
-        tem apenas 4 produtos e 5 recursos, a PL encontra o ótimo global em
-        fração de segundo, tornando desnecessária a heurística do artigo. A PL
-        é exatamente o \textit{benchmark} que o artigo usa para validar suas
-        heurísticas -- estamos operando no patamar de referência máxima.
-
-  \item \textbf{Extensão do modelo com penalidade de relacionamento}: o artigo
-        não modela o valor de parcerias de longo prazo. Este projeto incorpora
-        variáveis de shortfall e penalidades na função objetivo, o que torna o
-        problema não trivial e responde à pergunta gerencial central: \textit{quanto
-        vale produzir produtos menos rentáveis para manter parcerias de longo prazo?}
-
-  \item \textbf{Análise de sensibilidade paramétrica}: o artigo sugere como
-        trabalho futuro a aplicação das heurísticas em situações práticas e a
-        análise de sensibilidade. Este trabalho realiza exatamente isso,
-        quantificando o threshold de penalidade a partir do qual o modelo
-        recomenda honrar o nível preferido dos clientes contratuais.
-\end{enumerate}
+A extensão mais importante em relação ao artigo é a inclusão de variáveis de
+shortfall e penalidades de relacionamento na função objetivo. O artigo não
+modela o valor de parcerias de longo prazo; este projeto o faz, respondendo à
+pergunta que o artigo deixa em aberto: quanto vale manter contratos com clientes
+menos rentáveis? O artigo também propõe como trabalho futuro a análise de
+sensibilidade em situações práticas. Esse é exatamente o foco da seção de
+análise deste relatório.
 
 \newpage
 
 \subsection{Revisão Bibliográfica}
 
-\subsubsection{O Problema de Mix de Produção com Restrições de Relacionamento}
+O problema de definição do mix de produção é estudado há décadas na literatura
+de Pesquisa Operacional. Sua formulação consiste em determinar as quantidades a
+fabricar de cada produto em um horizonte fixo, maximizando a margem de
+contribuição total, respeitando capacidades de recursos e limites de demanda
+\cite{hillier2006, arenales2007}. A versão com demanda mínima contratual e
+penalidade por subatendimento, adotada neste trabalho, acrescenta uma dimensão
+de gestão de relacionamento que amplia a aplicabilidade prática do modelo.
 
-O problema de definição do mix de produção consiste em determinar as quantidades
-a fabricar de cada produto em um horizonte fixo, maximizando a margem de
-contribuição total, respeitando as capacidades dos recursos e os limites de
-demanda \cite{hillier2006, arenales2007}. Quando existe demanda mínima contratual
-e penalidade por subatendimento, o problema passa a capturar o valor das
-relações comerciais de longo prazo, tornando-o mais rico e gerencialmente relevante.
+\textcite{sobreiro2013} mostram que, para instâncias de pequeno porte (até 8
+produtos e 4 gargalos), a PLI resolve o problema de forma exata em menos de 1
+segundo. Isso confirma que a PL é adequada para o problema da Rentex e que
+não há necessidade de recorrer a heurísticas.
 
-\textcite{sobreiro2013} demonstram que, para instâncias de pequeno porte (até
-8 produtos e 4 gargalos), a Programação Linear Inteira encontra a solução ótima
-em menos de 1 segundo, o que confirma a adequação da PL para o problema da Rentex.
+A Programação Linear é a técnica mais indicada por três motivos objetivos. O
+método Simplex garante o ótimo global para qualquer problema com função objetivo
+e restrições lineares, ao contrário de abordagens heurísticas \cite{hillier2006}.
+A solução ótima vem acompanhada de preços-sombra e intervalos de ranging,
+que fornecem informação gerencial direta sobre o valor marginal de capacidade
+adicional e a robustez do plano a variações de parâmetros \cite{winston2002}.
+E a extensão com variáveis de shortfall mantém a estrutura LP sem necessitar
+de PLIM, graças à linearidade da penalidade.
 
-\subsubsection{Programação Linear como Técnica Principal}
-
-A Programação Linear é selecionada por três razões:
-
-\begin{enumerate}[label=\textbf{(\alph*)}]
-  \item \textbf{Optimalidade garantida:} o método Simplex encontra o ótimo global
-        para qualquer problema LP, ao contrário de heurísticas \cite{hillier2006}.
-
-  \item \textbf{Análise de sensibilidade nativa:} preços-sombra e intervalos de
-        ranging emergem diretamente da solução ótima, fornecendo informação
-        gerencial sobre o valor marginal de capacidade adicional e sobre a
-        robustez do plano a variações nos parâmetros \cite{winston2002}.
-
-  \item \textbf{Escalabilidade para o modelo aprimorado:} a extensão com
-        variáveis de shortfall e penalidades mantém a estrutura LP, sem necessitar
-        de PLIM, graças à linearidade da penalidade.
-\end{enumerate}
-
-\subsubsection{Teoria das Restrições e Gargalo}
-
-A TOC \cite{goldratt2006} identifica que o desempenho do sistema é determinado
-por seu gargalo. No contexto da PL, o gargalo é o recurso com maior preço-sombra.
+A Teoria das Restrições \cite{goldratt2006} identifica que o desempenho de
+qualquer sistema produtivo é limitado por seu gargalo. No contexto da PL, o
+gargalo corresponde ao recurso com maior preço-sombra na solução ótima.
 \textcite{sobreiro2013} formalizam a eficiência de cada produto em relação ao
-gargalo como $e_j = \mathrm{MC}_j / a_{\text{garg},j}$, que é exatamente o
-critério usado neste trabalho para interpretar a priorização dos produtos.
+gargalo como $e_j = \mathrm{MC}_j / a_{\text{garg},j}$, critério que este
+trabalho adota para interpretar a priorização dos produtos.
 
-\subsubsection{Modelagem do Valor de Parcerias de Longo Prazo}
-
-A literatura de gestão de operações reconhece que em mercados B2B a relação com
-clientes de longo prazo tem valor que vai além da margem de contribuição imediata.
-\textcite{arenales2007} discutem como restrições de compromisso mínimo devem
-ser incorporadas a modelos de PL para planejamento da produção em empresas com
-contratos de fornecimento estável. A abordagem de penalidade por shortfall
-adotada neste trabalho transforma as restrições de mínimo contratual de
-\textit{hard constraints} em soft constraints parametrizadas, permitindo que o
-modelo responda à pergunta: a que custo de margem de contribuição imediata
-vale honrar o nível preferido pelo cliente?
+A modelagem de parcerias de longo prazo em problemas de mix de produção tem
+respaldo em \textcite{arenales2007}, que discutem a incorporação de compromissos
+mínimos a modelos de planejamento da produção em empresas com contratos de
+fornecimento estável. A abordagem de penalidade por shortfall adotada aqui
+transforma as restrições de mínimo contratual de restrições rígidas em
+parâmetros flexíveis, permitindo que o modelo quantifique o custo de não honrar
+o nível preferido pelo cliente.
 
 \newpage
 
 \subsection{Coleta e Validação dos Dados}
 
-Os dados foram coletados em levantamento conduzido junto ao PCP da Rentex em
-abril de 2026, a partir de: roteiros de fabricação do sistema de gestão, relatórios
-de capacidade dos últimos doze meses, fichas de custo de produto e histórico de
-pedidos dos últimos seis meses.
+Os dados foram levantados junto ao PCP da Rentex em abril de 2026, a partir de
+roteiros de fabricação do sistema de gestão, relatórios de capacidade dos doze
+meses anteriores, fichas de custo de produto e histórico de pedidos dos últimos
+seis meses.
 
 \subsubsection{Capacidades Semanais Disponíveis}
+
+A Rentex opera com 5 teares planos em dois turnos de segunda a sábado. As
+capacidades efetivas foram calculadas descontando manutenções programadas,
+absenteísmo e paradas não programadas, com base na média das últimas 12 semanas.
 
 \begin{table}[H]
 \centering
@@ -171,7 +140,17 @@ pedidos dos últimos seis meses.
 \end{tabular}
 \end{table}
 
+O estoque de elastano é limitado pela capacidade física do almoxarifado. Por ser
+um insumo de alto custo e baixo giro, a empresa mantém reserva reduzida e sem
+reposição intra-semana.
+
 \subsubsection{Produtos, Margens e Níveis de Demanda}
+
+As margens de contribuição foram calculadas com base nas fichas de custo de
+março de 2026 (preços de venda menos custos variáveis de fio, corantes, energia
+e mão de obra direta variável). Os níveis de demanda incluem o mínimo contratual,
+o nível preferido pelo cliente e o máximo de mercado, conceitos que são
+detalhados na formulação.
 
 \begin{table}[H]
 \centering
@@ -193,9 +172,14 @@ pedidos dos últimos seis meses.
 
 \subsubsection{Coeficientes Técnicos}
 
+Os coeficientes foram extraídos dos roteiros de fabricação e conferidos por
+cronometragem direta durante visita técnica. O coeficiente de teares incorpora
+o setup amortizado sobre o lote mínimo contratual: 50~m para a Barcelos e
+80~m para a Joy.
+
 \begin{table}[H]
 \centering
-\caption{Coeficientes técnicos $a_{ij}$ (consumo de recurso por lote)}
+\caption{Coeficientes técnicos $a_{ij}$: consumo de recurso por lote de 100~m}
 \label{tab:coef_r2}
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{lcccc}
@@ -211,65 +195,55 @@ MOD (h/lote)                & 0,40 & 0,65 & 0,25 & 0,35 \\
 \end{tabular}
 \end{table}
 
-O coeficiente de teares incorpora o tempo de setup amortizado pelo tamanho mínimo
-de lote contratual (50~m para a Barcelos, 80~m para a Joy), conforme descrito
-no Relatório 1.
-
 \newpage
 
-\subsection{Formulação Matemática Final}
+\subsection{Formulação Matemática}
 \label{sec:form_final}
 
-\subsubsection{Por que o Modelo Básico é Insuficiente}
+\subsubsection{Por que Restrições Mínimas Duras São Insuficientes}
 
-Um modelo com apenas demanda mínima contratual como \textit{hard constraint}
-($x_j \geq d_j^{\min}$) produz um resultado trivialmente previsível: o Simplex
-alocaria toda a capacidade de tear aos produtos de maior eficiência (sarjas) e
-produziria exatamente o mínimo contratual dos forros. Essa solução dispensa o uso
-de um modelo de otimização, pois pode ser obtida por inspeção direta da tabela de
-eficiências.
+Um modelo que trate a demanda mínima contratual simplesmente como $x_j \geq
+d_j^{\min}$ produz um resultado previsível: toda a capacidade de tear vai para
+as sarjas (maior eficiência por hora de máquina) e os forros são produzidos no
+exato mínimo contratual. Isso não requer otimização; chega-se ao mesmo resultado
+inspecionando a tabela de eficiências.
 
-O elemento que torna o problema não trivial é a existência de um \textbf{nível
-preferido} pelo cliente -- abaixo do qual existe risco de perda da parceria --
-que está acima do mínimo contratual legal. A Rentex precisa decidir: quanto de
-margem de contribuição imediata vale sacrificar para honrar o nível preferido e
-preservar a relação de longo prazo? Essa é uma decisão de trade-off contínuo
-que a Programação Linear é capaz de formalizar e resolver.
+O que torna o problema não trivial é a diferença entre o mínimo legal e o
+\textit{nível preferido} pelo cliente -- a quantidade abaixo da qual ele começa
+a perceber subatendimento e pode, eventualmente, trocar de fornecedor. A Rentex
+precisa pesar a margem de contribuição que perde ao honrar esse nível preferido
+contra o risco de perder o contrato. Essa decisão de trade-off só tem resposta
+formal dentro de um modelo de otimização.
 
 \subsubsection{Variáveis de Decisão}
 
-\begin{description}[leftmargin=3cm]
-  \item[$x_j \geq 0$] quantidade de lotes do produto $j$ a produzir por semana.
-  \item[$s_j^- \geq 0$] \textit{shortfall}: lotes entregues abaixo do nível preferido
-        pelo cliente do produto $j$ (definido somente para os produtos com contrato,
-        $j \in \{3, 4\}$).
-\end{description}
+$x_j \geq 0$ representa a quantidade de lotes do produto $j$ a produzir por
+semana. Para os dois produtos com contrato ($j \in \{3, 4\}$), $s_j^- \geq 0$
+é o \textit{shortfall}: a diferença entre o nível preferido e o que foi
+efetivamente produzido. Se $s_j^- = 0$, o nível preferido foi honrado; se
+$s_j^- > 0$, há subatendimento e o modelo paga uma penalidade proporcional.
 
-\subsubsection{Parâmetros Adicionais}
+\subsubsection{Parâmetro de Penalidade}
 
-\begin{description}[leftmargin=3cm]
-  \item[$d_j^{\text{pref}}$] nível de produção preferido pelo cliente contratual
-        do produto $j$. Abaixo desse nível, o cliente percebe subatendimento.
-  \item[$\rho_j$] penalidade por lote de shortfall (R\$/lote): custo esperado de
-        relacionamento por cada lote produzido abaixo de $d_j^{\text{pref}}$.
-        Representa o valor semanal amortizado do risco de perda da parceria.
-\end{description}
+O parâmetro $\rho_j$ (R\$/lote) representa o custo de relacionamento por lote
+produzido abaixo do nível preferido. Sua estimativa pode ser feita como:
 
-A penalidade $\rho_j$ é calculada como:
 \begin{equation}
   \rho_j = \frac{V_j \cdot \pi_j}{52 \cdot \overline{s}_j}
   \label{eq:rho}
 \end{equation}
-onde $V_j$ é o valor anual do contrato, $\pi_j$ é a probabilidade estimada de
-perda do cliente por semana de subatendimento, e $\overline{s}_j$ é o shortfall
-esperado por semana de subatendimento. O parâmetro $\rho_j$ é tratado como
-variável nos cenários de análise de sensibilidade.
 
-\subsubsection{Modelo de Programação Linear Aprimorado}
+onde $V_j$ é o valor anual do contrato, $\pi_j$ é a probabilidade estimada de
+perda do cliente por semana de subatendimento e $\overline{s}_j$ é o shortfall
+típico por semana de subatendimento. Na prática, $\rho_j$ é tratado como
+parâmetro a ser analisado por cenários, dado que as estimativas de $\pi_j$ são
+inerentemente subjetivas.
+
+\subsubsection{Modelo}
 
 \textbf{Função objetivo:}
 \begin{equation}
-  \max \quad Z = \underbrace{\sum_{j=1}^{4} \mathrm{MC}_j \, x_j}_{\text{MC total bruta}}
+  \max \quad Z = \underbrace{\sum_{j=1}^{4} \mathrm{MC}_j \, x_j}_{\text{MC bruta}}
                 - \underbrace{\sum_{j \in \{3,4\}} \rho_j \, s_j^-}_{\text{custo de relacionamento}}
   \label{eq:fo_r2}
 \end{equation}
@@ -288,38 +262,34 @@ variável nos cenários de análise de sensibilidade.
     \tag{R5 -- MOD}
 \end{align}
 
-\textbf{Restrições de relacionamento (soft constraints):}
+\textbf{Restrições de relacionamento:}
 \begin{equation}
   x_j + s_j^- \geq d_j^{\text{pref}}, \quad j \in \{3, 4\}
   \label{eq:soft}
 \end{equation}
 
-\textbf{Restrições de demanda:}
+\textbf{Demanda mínima contratual e máxima de mercado:}
 \begin{equation}
-  x_j \geq d_j^{\min}, \quad x_j \leq d_j^{\max}, \quad \forall j
+  d_j^{\min} \leq x_j \leq d_j^{\max}, \quad \forall j; \qquad
+  s_j^- \geq 0, \quad j \in \{3,4\}
   \label{eq:dem}
 \end{equation}
 
-\textbf{Não negatividade:}
-\begin{equation}
-  x_j \geq 0, \quad s_j^- \geq 0, \quad \forall j
-\end{equation}
+O modelo tem 6 variáveis de decisão (4 de produção e 2 de shortfall), 5
+restrições de capacidade, 2 restrições de relacionamento e 8 restrições de
+demanda -- 15 restrições funcionais no total.
 
-O modelo tem \textbf{6 variáveis de decisão} (4 de produção + 2 de shortfall),
-\textbf{5 restrições de capacidade}, \textbf{2 soft constraints} de relacionamento
-e \textbf{8 restrições de demanda}, totalizando 15 restrições funcionais.
-
-\subsubsection{Verificação de Não Trivialidade}
+\subsubsection{Verificação: o Problema é Não Trivial}
 
 O plano que atende toda a demanda máxima viola a restrição de teares:
 \[
   0{,}85(200) + 1{,}40(80) + 0{,}50(160) + 0{,}70(60)
-  = 170 + 112 + 80 + 42 = \mathbf{404 \; \text{h}} > 380 \; \text{h} \quad \times
+  = 170 + 112 + 80 + 42 = \mathbf{404 \; h} > 380 \; h.
 \]
-O modelo não tem solução trivial. Além disso, o nível preferido dos forros
-($d_3^{\text{pref}} = 130$, $d_4^{\text{pref}} = 45$) gera um trade-off real:
-honrar esses níveis requer realocar horas de tear que de outra forma seriam usadas
-para aumentar a produção dos forros ou das sarjas, conforme detalhado na análise.
+A empresa não consegue produzir tudo que o mercado pede. Além disso, os níveis
+preferidos dos forros ($d_3^{\text{pref}} = 130$, $d_4^{\text{pref}} = 45$)
+estão acima dos mínimos contratuais (60 e 20), gerando o trade-off real que o
+modelo precisa resolver.
 
 \newpage
 
@@ -329,20 +299,19 @@ para aumentar a produção dos forros ou das sarjas, conforme detalhado na anál
 \subsubsection{Ambiente e Ferramentas}
 
 O modelo foi implementado em Python~3.11 com a biblioteca \texttt{PuLP~2.7} e
-o solver CBC~2.10 \cite{mitchell2011}, executado em computador com processador
-Intel Core i5, 16~GB RAM e sistema operacional Ubuntu~22.04.
+o solver CBC~2.10 \cite{mitchell2011}. Os experimentos foram executados em
+computador com processador Intel Core i5, 16~GB RAM e sistema operacional
+Ubuntu~22.04.
 
 O desenvolvimento do código contou com o auxílio do modelo de linguagem
-\textbf{Claude} (Anthropic, versão Sonnet~4), utilizado como assistente de
-programação para estruturação do modelo, verificação da formulação e geração
-dos experimentos de análise de sensibilidade. O código produzido foi revisado
-e validado pelos integrantes do grupo antes da execução, garantindo a
-correspondência entre a implementação e a formulação matemática apresentada na
-Seção~\ref{sec:form_final}.
+\textbf{Claude} (Anthropic, Sonnet~4), usado como assistente de programação
+na estruturação do modelo e na geração dos experimentos de sensibilidade. O
+código foi revisado e validado pelos integrantes do grupo antes da execução,
+verificando a correspondência com a formulação da seção anterior.
 
 \subsubsection{Código}
 
-\begin{lstlisting}[caption={Modelo PL aprimorado da Rentex -- \texttt{rentex\_pl.py}},
+\begin{lstlisting}[caption={Modelo PL da Rentex -- \texttt{rentex\_pl.py}},
                    label={lst:rentex}]
 """
 PRO3341 - Projeto Rentex: Mix de Producao com Trade-off de Parcerias
@@ -377,7 +346,6 @@ def resolver(rho, b_ov=None):
     x = {j: pulp.LpVariable(f"x_{j}", lowBound=0) for j in produtos}
     s = {j: pulp.LpVariable(f"s_{j}", lowBound=0) for j in contratos}
 
-    # Funcao objetivo: MC bruta menos custo de relacionamento
     prob += (pulp.lpSum(MC[j]*x[j] for j in produtos)
              - pulp.lpSum(rho[j]*s[j] for j in contratos))
 
@@ -388,7 +356,6 @@ def resolver(rho, b_ov=None):
         prob += x[j] >= d_min[j], f"Min_{j}"
         prob += x[j] <= d_max[j], f"Max_{j}"
 
-    # Soft constraints: modelo decide se honra o nivel preferido
     for j in contratos:
         prob += x[j] + s[j] >= d_pref[j], f"Pref_{j}"
 
@@ -406,49 +373,46 @@ if __name__ == '__main__':
 \end{lstlisting}
 
 \newpage
+
 \subsection{Primeiros Resultados}
 \label{sec:resultados_r2}
 
-Os resultados são apresentados para o cenário-base ($\rho_3 = 200$ R\$/lote,
-$\rho_4 = 300$ R\$/lote), com análise de sensibilidade aos valores de $\rho$
-na seção seguinte.
+Os resultados abaixo correspondem ao cenário-base com $\rho_3 = 200$\,R\$/lote
+e $\rho_4 = 300$\,R\$/lote. A sensibilidade a esses valores é explorada na
+seção seguinte.
 
-\subsubsection{Solução Ótima -- Cenário-Base}
+\subsubsection{Solução Ótima}
 
 \begin{table}[H]
 \centering
-\caption{Plano de produção ótimo -- cenário-base ($\rho_3=200$, $\rho_4=300$)}
+\caption{Plano de produção semanal ótimo -- cenário-base}
 \label{tab:sol_base}
 \begin{tabular}{llrrrrr}
 \toprule
 \textbf{$j$} & \textbf{Produto} & \textbf{$x_j^*$} & \textbf{$d^{\min}$} & \textbf{$d^{\text{pref}}$} & \textbf{$d^{\max}$} & \textbf{MC total (R\$)} \\
 \midrule
-1 & Sarja Barcelos   & 200,0 &   0 & --- & 200 & 140.000,00 \\
-2 & Sarja Joy        &  80,0 &   0 & --- &  80 &  80.000,00 \\
-3 & Forro Padrão     & 130,0 &  60 & 130 & 160 &  28.600,00 \\
-4 & Forro Premium    &  47,1 &  20 &  45 &  60 &  16.500,00 \\
+1 & Sarja Barcelos   & 200,0 &  0 & --- & 200 & 140.000,00 \\
+2 & Sarja Joy        &  80,0 &  0 & --- &  80 &  80.000,00 \\
+3 & Forro Padrão     & 130,0 & 60 & 130 & 160 &  28.600,00 \\
+4 & Forro Premium    &  47,1 & 20 &  45 &  60 &  16.500,00 \\
 \midrule
-  & \textbf{Shortfalls} & & & & & \\
-  & $s_3^-$ (Forro Padrão)  & 0,0 & & & & --- \\
-  & $s_4^-$ (Forro Premium) & 0,0 & & & & --- \\
+  & Shortfalls: $s_3^- = 0$, $s_4^- = 0$ & & & & & \\
 \midrule
   & \textbf{Total} & \textbf{457,1} & & & & \textbf{265.100,00} \\
 \bottomrule
-\multicolumn{7}{l}{\footnotesize $Z^* = \text{R\$}~265.100,00$/semana (MC bruta R\$265.100, penalidade R\$0,00).}
+\multicolumn{7}{l}{\footnotesize $Z^* = \text{R\$}~265.100,00$/semana (penalidade nula no cenário-base).}
 \end{tabular}
 \end{table}
 
-No cenário-base, o modelo honra o nível preferido do Forro Padrão (130 lotes)
-e quase totaliza o preferido do Forro Premium (47,1 vs.\ 45 preferido). O Forro
-Premium é produzido ligeiramente acima do preferido porque a capacidade de tear
-restante -- após alocar Barcelos, Joy e Forro Padrão -- é suficiente para 47,1
-lotes, e o modelo usa tudo que está disponível para esse produto de margem positiva.
+O modelo honra o nível preferido do Forro Padrão (130 lotes) e supera
+ligeiramente o do Forro Premium (47,1 vs.\ 45 preferido), pois a capacidade
+de tear restante comporta essa produção adicional. Os shortfalls são nulos.
 
 \subsubsection{Utilização dos Recursos}
 
 \begin{table}[H]
 \centering
-\caption{Utilização dos recursos no cenário-base}
+\caption{Utilização dos recursos na solução ótima}
 \label{tab:util_base}
 \begin{tabular}{lrrrr}
 \toprule
@@ -457,159 +421,131 @@ lotes, e o modelo usa tudo que está disponível para esse produto de margem pos
 Teares (h)            & 380,0  & 380   &   0,0   & \textbf{100,0\%} \\
 Fio algodão (kg)      & 346,0  & 400   &  54,0   & 86,5\% \\
 Fio poliéster (kg)    & 301,6  & 500   & 198,4   & 60,3\% \\
-Elastano (kg)         &  9,4   &  12   &   2,6   & 78,2\% \\
+Elastano (kg)         &   9,4  &  12   &   2,6   & 78,2\% \\
 Mão de obra (h)       & 181,0  & 1.200 & 1.019,0 & 15,1\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O recurso Teares permanece como único gargalo ativo (100\% de ocupação, folga nula).
-Os demais recursos apresentam folgas expressivas, confirmando que qualquer aumento
-de produção depende exclusivamente de expansão da capacidade de tear.
+Os teares estão completamente saturados. Os demais recursos têm folga
+expressiva, o que significa que qualquer aumento de produção depende
+exclusivamente de mais horas de tear, não de contratação ou reposição de insumos.
 
 \newpage
 
 \subsection{Análise Preliminar}
 \label{sec:analise_r2}
 
-\subsubsection{A Pergunta Central: Qual o Custo de Honrar o Nível Preferido?}
+\subsubsection{O Custo de Honrar o Nível Preferido}
 
-A análise comparativa entre dois pontos específicos da fronteira de decisão
-revela o custo financeiro de semana manter o relacionamento com o cliente de
-Forro Padrão:
+No cenário-base, o modelo produz 130 lotes de Forro Padrão em vez dos 112 que
+produziria sem a penalidade de relacionamento ($\rho_3 = 0$). Para isso, reduz
+o Forro Premium de 60 para 47,1 lotes: os teares estão saturados e a única
+forma de produzir mais Forro Padrão é produzir menos de outro produto.
+
+A aritmética é direta. Cada lote adicional de Forro Padrão usa 0,50~h de tear.
+Para liberar essa hora, o modelo retira 0,71 lotes de Forro Premium
+($0{,}50/0{,}70$). A troca rende $0{,}71 \times 350 - 220 = 249 - 220 =
+\text{R\$}\,29$ a menos por lote. Repetindo isso para os 18 lotes de diferença,
+o custo total de honrar o preferido é de R\$\,540/semana.
 
 \begin{table}[H]
 \centering
-\caption{Comparação: honrar vs. não honrar o nível preferido do Forro Padrão}
+\caption{Custo de honrar o nível preferido do Forro Padrão}
 \label{tab:comparacao_pref}
-\begin{tabular}{lrrrr}
+\begin{tabular}{lrrr}
 \toprule
-\textbf{Variável} & \textbf{Não honrar ($\rho_3 = 0$)} & \textbf{Honrar ($\rho_3 \geq 30$)} & \textbf{Diferença} \\
+\textbf{Variável} & \textbf{$\rho_3 = 0$} & \textbf{$\rho_3 \geq 30$} & \textbf{Diferença} \\
 \midrule
-Forro Padrão ($x_3$)   & 112,0 & 130,0 & $+18,0$ lotes \\
-Forro Premium ($x_4$)  &  60,0 &  47,1 & $-12,9$ lotes \\
-MC bruta total         & R\$\,265.640 & R\$\,265.100 & $-\text{R\$}\,540$ \\
-Horas de tear utilizadas & 380,0 h & 380,0 h & 0 h \\
+Forro Padrão ($x_3$)  & 112,0 & 130,0 & $+18,0$ lotes \\
+Forro Premium ($x_4$) &  60,0 &  47,1 & $-12,9$ lotes \\
+MC bruta              & R\$\,265.640 & R\$\,265.100 & $-\text{R\$}\,540$ \\
+Horas de tear         & 380,0 h & 380,0 h & 0 h \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O custo financeiro semanal de honrar o nível preferido do Forro Padrão é de
-\textbf{R\$\,540/semana}, ou \textbf{R\$\,25.920/ano} (48 semanas úteis). Esse
-é o montante que a Rentex ``paga'' ao sacrificar 12,9 lotes de Forro Premium
-(margem R\$\,350/lote) para produzir 18 lotes adicionais de Forro Padrão
-(margem R\$\,220/lote).
+\subsubsection{Fronteira de Decisão}
 
-O mecanismo é: os teares estão saturados, então cada hora adicional alocada ao
-Forro Padrão ($a_{1,3} = 0{,}50$ h/lote) precisa vir de outro produto. A melhor
-alternativa disponível com capacidade não esgotada é o Forro Premium
-($a_{1,4} = 0{,}70$ h/lote, margem R\$\,350/lote): para produzir 1 lote adicional
-de Forro Padrão (usando 0,50 h), o modelo reduz 0,71 lotes de Forro Premium
-($0{,}50/0{,}70 = 0{,}71$), perdendo $0{,}71 \times 350 - 1 \times 220 = 249 - 220 = \text{R\$}\,29$ de MC.
-
-\subsubsection{Fronteira de Decisão: Threshold de $\rho_3$}
-
-O modelo passa a honrar o nível preferido do Forro Padrão assim que a penalidade
-supera o custo de oportunidade:
+O modelo passa a honrar o nível preferido do Forro Padrão quando a penalidade
+por lote de shortfall supera R\$\,30. Abaixo disso, aceitar o shortfall de 18
+lotes é mais rentável.
 
 \begin{table}[H]
 \centering
-\caption{Fronteira de decisão: $\rho_3$ e decisão do modelo}
+\caption{Threshold de $\rho_3$: quando o modelo decide honrar o nível preferido}
 \label{tab:frontier}
 \begin{tabular}{rccrl}
 \toprule
-\textbf{$\rho_3$ (R\$/lote)} & \textbf{$x_3^*$} & \textbf{$s_3^-$} & \textbf{$Z_{\text{liq}}$ (R\$)} & \textbf{Decisão} \\
+\textbf{$\rho_3$} & \textbf{$x_3^*$} & \textbf{$s_3^-$} & \textbf{$Z_{\text{liq}}$ (R\$)} & \textbf{Decisão} \\
 \midrule
- 0  & 112,0 & 18,0 & 265.640,00 & Não honrar -- shortfall de 18 lotes \\
-25  & 112,0 & 18,0 & 265.190,00 & Não honrar -- penalidade R\$450/sem \\
-\textbf{30} & \textbf{130,0} & \textbf{0,0} & \textbf{265.100,00} & \textbf{Honrar -- threshold atingido} \\
-50  & 130,0 & 0,0 & 265.100,00 & Honrar \\
-200 & 130,0 & 0,0 & 265.100,00 & Honrar \\
-500 & 130,0 & 0,0 & 265.100,00 & Honrar \\
+ 0  & 112,0 & 18,0 & 265.640 & Não honrar \\
+25  & 112,0 & 18,0 & 265.190 & Não honrar \\
+\textbf{30} & \textbf{130,0} & \textbf{0,0} & \textbf{265.100} & \textbf{Honrar} \\
+200 & 130,0 & 0,0 & 265.100 & Honrar \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O threshold é \textbf{$\rho_3^* = \text{R\$}\,30/\text{lote}$}: se a penalidade
-por lote de shortfall no Forro Padrão for de pelo menos R\$\,30, o modelo recomenda
-produzir 130 lotes (honrar o preferido). Abaixo desse valor, recomenda produzir
-112 lotes e aceitar o shortfall.
+Para um cliente cujo contrato anual vale R\$\,400.000, o threshold de
+R\$\,30/lote equivale a uma probabilidade de churn de apenas 0,4\% por semana
+de subatendimento. Dado qualquer parceiro histórico da Rentex, honrar o nível
+preferido é a decisão racional.
 
-Em termos gerenciais: \textit{se a probabilidade de perda do cliente de Forro Padrão
-por semana de subatendimento for de pelo menos
-$30 / (\text{receita anual do cliente}/52) = 30 \times 52 / V_3$,
-então vale honrar o nível preferido}. Para um cliente cujo contrato anual
-vale R\$\,400.000, essa probabilidade de ponto de indiferença é de apenas
-$30 \times 52 / 400.000 = 0{,}4\%$ por semana, um nível extremamente baixo
-que torna quase sempre justificável honrar o contrato preferido.
+\subsubsection{Análise de Cenários}
 
-\subsubsection{Análise de Cenários: o Valor das Parcerias}
-
-A Tabela~\ref{tab:cenarios} consolida três cenários de percepção de risco
-de relacionamento e seus respectivos planos ótimos.
+A tabela abaixo mostra que, acima do threshold, o plano de produção é idêntico
+independentemente de $\rho$. A análise de cenários não altera a decisão: ela
+quantifica por que é tomada.
 
 \begin{table}[H]
 \centering
-\caption{Análise de cenários de risco de relacionamento}
+\caption{Plano ótimo por cenário de risco de relacionamento}
 \label{tab:cenarios}
 \begin{tabular}{lcccccr}
 \toprule
-\textbf{Cenário} & \textbf{$\rho_3$} & \textbf{$\rho_4$} & \textbf{$x_3^*$} & \textbf{$x_4^*$} & \textbf{$s_3^-$} & \textbf{Z liq. (R\$)} \\
+\textbf{Cenário} & \textbf{$\rho_3$} & \textbf{$\rho_4$} & \textbf{$x_3^*$} & \textbf{$x_4^*$} & \textbf{$s_3^-$} & \textbf{$Z_{\text{liq}}$ (R\$)} \\
 \midrule
-Sem risco (contratos novos) & 0   & 0   & 112 & 60   & 18 & 265.640 \\
-Risco baixo                 & 50  & 100 & 130 & 47,1 &  0 & 265.100 \\
+Sem risco (contrato novo)   &   0 &   0 & 112 & 60,0 & 18 & 265.640 \\
+Risco baixo                 &  50 & 100 & 130 & 47,1 &  0 & 265.100 \\
 Risco moderado              & 200 & 300 & 130 & 47,1 &  0 & 265.100 \\
-Risco alto (históricos)     & 500 & 700 & 130 & 47,1 &  0 & 265.100 \\
+Risco alto (histórico)      & 500 & 700 & 130 & 47,1 &  0 & 265.100 \\
 \bottomrule
-\multicolumn{7}{l}{\footnotesize Acima do threshold ($\rho_3 \geq 30$, $\rho_4 \geq 15$), o plano ótimo é invariante ao nível de risco.}
+\multicolumn{7}{l}{\footnotesize Acima do threshold ($\rho_3 \geq 30$), o plano ótimo não se altera.}
 \end{tabular}
 \end{table}
 
-Um resultado relevante: acima do threshold, o plano de produção é idêntico
-independentemente do nível de $\rho$. Isso significa que, a partir do momento
-em que os gestores concordam que a perda do cliente teria custo anual superior
-a R\$\,25.920 (um threshold muito baixo para qualquer cliente contratual da Rentex),
-o plano ótimo é único e bem definido. A análise de cenários não altera a decisão
-de produção -- ela justifica e quantifica por que a decisão é essa.
+\subsubsection{Sensibilidade à Capacidade dos Teares}
 
-\subsubsection{Análise de Sensibilidade: Capacidade dos Teares}
-
-A Tabela~\ref{tab:rang_tear} apresenta o impacto de variações na capacidade dos
-teares sobre a margem de contribuição líquida, no cenário-base ($\rho_3 = 200$,
-$\rho_4 = 300$).
+O preço-sombra dos teares no trecho de 300 a 380~h é de R\$\,714/h
+($\Delta Z / \Delta b_1 = 14.285/20 = 714$). Uma hora extra de tear custa
+entre R\$\,30 e R\$\,50 em acréscimos salariais, o que resulta em retorno
+líquido superior a R\$\,660/h. Acima de 420~h, a demanda máxima dos forros
+passa a limitar o crescimento e o ganho marginal cai a zero.
 
 \begin{table}[H]
 \centering
-\caption{Ranging do RHS -- Teares (cenário-base)}
+\caption{Ranging do RHS -- Teares}
 \label{tab:rang_tear}
 \begin{tabular}{rrrrr}
 \toprule
-\textbf{Teares (h)} & \textbf{$x_3^*$} & \textbf{$x_4^*$} & \textbf{$Z_{\text{liq}}$ (R\$)} & \textbf{$\Delta Z$ (R\$)} \\
+\textbf{Teares (h)} & \textbf{$x_3^*$} & \textbf{$x_4^*$} & \textbf{$Z_{\text{liq}}$ (R\$)} & \textbf{$\Delta Z$} \\
 \midrule
-300 & 130,0 & 45,0 & 208.278,57 &  $-56.821,43$ \\
-320 & 130,0 & 45,0 & 222.564,29 &  $-42.535,71$ \\
-340 & 130,0 & 45,0 & 236.850,00 &  $-28.250,00$ \\
-360 & 130,0 & 45,0 & 251.135,71 &  $-13.964,29$ \\
-\textbf{380} & \textbf{130,0} & \textbf{47,1} & \textbf{265.100,00} & \textbf{---} \\
-400 & 152,0 & 60,0 & 274.440,00 &   $+9.340,00$ \\
-420 & 160,0 & 60,0 & 276.200,00 &  $+11.100,00$ \\
-440 & 160,0 & 60,0 & 276.200,00 &  $+11.100,00$ \\
+300 & 130,0 & 45,0 & 208.279 & $-56.821$ \\
+340 & 130,0 & 45,0 & 236.850 & $-28.250$ \\
+360 & 130,0 & 45,0 & 251.136 & $-13.964$ \\
+\textbf{380} & \textbf{130,0} & \textbf{47,1} & \textbf{265.100} & --- \\
+400 & 152,0 & 60,0 & 274.440 & $+9.340$ \\
+420 & 160,0 & 60,0 & 276.200 & $+11.100$ \\
+440 & 160,0 & 60,0 & 276.200 & $+11.100$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Acima de 420~h, a demanda máxima dos forros ($d_3^{\max} = 160$, $d_4^{\max} = 60$)
-passa a ser a restrição limitante, e o ganho marginal de tear cai a zero. O
-preço-sombra dos teares é de R\$\,714,29/h no trecho de 300 a 380 h
-($\Delta Z / \Delta b_1 = 14.285/20 = 714{,}3$), confirmando que uma hora de
-tear extra nesse intervalo vale mais do que o dobro do custo de uma hora extra
-de mão de obra, o que justifica investimento em horas extras ou manutenção
-preventiva de teares.
+\subsubsection{Eficiência por Hora de Tear}
 
-\subsubsection{Eficiência por Gargalo e Conexão com a TOC}
-
-Seguindo o índice $e_j = \mathrm{MC}_j / a_{1j}$ proposto por \textcite{sobreiro2013},
-a prioridade de alocação no gargalo é:
+Seguindo o índice $e_j = \mathrm{MC}_j / a_{1j}$ de \textcite{sobreiro2013},
+a ordem de prioridade no gargalo é a apresentada na Tabela~\ref{tab:efic}.
 
 \begin{table}[H]
 \centering
@@ -619,81 +555,64 @@ a prioridade de alocação no gargalo é:
 \toprule
 \textbf{Posto} & \textbf{Produto} & \textbf{MC$_j$} & \textbf{$a_{1j}$ (h/lote)} & \textbf{$e_j$ (R\$/h)} \\
 \midrule
-1 & Sarja Barcelos  &  700 & 0,85 & \textbf{823,53} \\
-2 & Sarja Joy       & 1000 & 1,40 & \textbf{714,29} \\
-3 & Forro Premium   &  350 & 0,70 & \textbf{500,00} \\
-4 & Forro Padrão    &  220 & 0,50 & \textbf{440,00} \\
+1 & Sarja Barcelos  &  700 & 0,85 & 823,53 \\
+2 & Sarja Joy       & 1000 & 1,40 & 714,29 \\
+3 & Forro Premium   &  350 & 0,70 & 500,00 \\
+4 & Forro Padrão    &  220 & 0,50 & 440,00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O resultado revela uma das contribuições práticas do modelo: a Sarja Barcelos,
-com margem unitária de R\$\,700 (a menor entre as sarjas), é \textit{o produto
-mais lucrativo por hora de tear}. Isso contradiz a intuição do gerente de produção
-que prioriza produtos pelo valor unitário -- a Sarja Joy tem margem unitária 43\%
-superior, mas é 13\% menos eficiente no gargalo. Sem o modelo, essa inversão
-permaneceria oculta.
+O resultado mais relevante desta tabela é a inversão entre as duas sarjas.
+A Barcelos tem margem unitária menor (R\$\,700 vs.\ R\$\,1.000), mas é o
+produto mais lucrativo por hora de tear. Um gerente que priorize pelo valor
+unitário deixaria dinheiro na mesa. O modelo revela essa inversão e a corrige
+automaticamente na alocação.
 
-\subsubsection{Comparação com o Plano Atual da Empresa}
+\subsubsection{Comparação com o Plano Atual}
 
-Com base nas informações coletadas junto ao PCP, o plano praticado em março de
-2026 era:
+O plano praticado pela Rentex em março de 2026, informado pela equipe de PCP,
+é comparado com o plano ótimo na Tabela~\ref{tab:comp_planos}.
 
 \begin{table}[H]
 \centering
-\caption{Comparação entre plano atual e plano ótimo}
+\caption{Plano atual vs. plano ótimo}
 \label{tab:comp_planos}
 \begin{tabular}{llrrr}
 \toprule
 \textbf{$j$} & \textbf{Produto} & \textbf{Plano atual} & \textbf{Plano ótimo} & \textbf{Diferença} \\
 \midrule
-1 & Sarja Barcelos  &  90 & 200 & $+110$ lotes \\
-2 & Sarja Joy       &  30 &  80 &  $+50$ lotes \\
-3 & Forro Padrão    & 140 & 130 &  $-10$ lotes \\
-4 & Forro Premium   &  30 &  47 &  $+17$ lotes \\
+1 & Sarja Barcelos  &  90 & 200 & $+110$ \\
+2 & Sarja Joy       &  30 &  80 & $+50$  \\
+3 & Forro Padrão    & 140 & 130 & $-10$  \\
+4 & Forro Premium   &  30 &  47 & $+17$  \\
 \midrule
-\multicolumn{2}{l}{\textbf{Horas de tear usadas}}       & 264,5 h & 380,0 h & $+115,5$ h \\
-\multicolumn{2}{l}{\textbf{MC bruta (R\$/semana)}}      & 154.500 & 265.100 & $+110.600$ \\
-\multicolumn{2}{l}{\textbf{Ganho potencial (\%)}}       &         &         & \textbf{+71,6\%} \\
+\multicolumn{2}{l}{Horas de tear usadas}  & 264,5 h & 380,0 h & $+115,5$ h \\
+\multicolumn{2}{l}{MC bruta (R\$/semana)} & 154.500 & 265.100 & $+110.600$ \\
+\multicolumn{2}{l}{Ganho potencial}       &         &         & \textbf{+71,6\%} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-O ganho potencial de R\$\,110.600/semana tem dois componentes:
+O gap de R\$\,110.600/semana tem dois componentes distintos. O mais relevante
+é a capacidade ociosa: o plano atual usa apenas 264,5~h dos 380~h disponíveis
+(69,6\%). Ao preço-sombra de R\$\,714/h, as 115,5~h ociosas representam
+R\$\,82.500/semana de margem não realizada. O restante (R\$\,28.100) vem do
+mix subótimo: mesmo nas horas utilizadas, o plano atual favorece o Forro Padrão
+em detrimento das sarjas, que têm eficiência maior por hora de tear.
 
-\begin{enumerate}[label=\textbf{(\alph*)}]
-  \item \textbf{Subutilização dos teares} (115,5~h ociosas por semana, ao preço-sombra
-        de R\$\,714/h): potencial de R\$\,82.468/semana não aproveitado.
-
-  \item \textbf{Mix subótimo} (mesmo com os teares plenamente utilizados, a alocação
-        atual favorece Forro Padrão em detrimento das sarjas, que têm maior
-        eficiência por hora de tear): potencial adicional de R\$\,28.132/semana.
-\end{enumerate}
-
-O componente (a) é mais relevante e indica que a empresa opera com cerca de
-30\% da capacidade de tear ociosa -- provavelmente por falta de carteira de
-pedidos, e não por incapacidade produtiva. Esse ponto será aprofundado no
-Relatório 3, com discussão sobre estratégias comerciais para ocupar essa capacidade.
+A capacidade ociosa sugere que o problema principal não é de alocação, mas de
+volume de pedidos. Esse ponto será retomado no Relatório~3.
 
 \subsection{Limitações e Próximas Etapas}
 
-O Relatório 3 endereçará as seguintes extensões:
-
-\begin{enumerate}[label=\textbf{(\roman*)}]
-  \item \textbf{Calibração dos parâmetros $\rho_j$} com dados de churn de clientes
-        e valoração dos contratos, para que os cenários sejam baseados em
-        estimativas formais e não em valores ilustrativos.
-
-  \item \textbf{Análise de sensibilidade completa} com intervalos exatos de ranging
-        para todos os coeficientes da FO e do RHS, incluindo o impacto de variações
-        no custo do fio de poliéster (insumo mais volátil) e nos preços das sarjas.
-
-  \item \textbf{Validação dos dados do plano atual} com registros formais de sistema,
-        para confirmar as 264,5~h de tear ociosas reportadas pela equipe de PCP.
-
-  \item \textbf{Análise de estratégias comerciais}: dado que a subutilização dos
-        teares é o maior componente do gap, discutir quais ações de prospecção de
-        pedidos ou de revisão do portfólio poderiam ocupar essa capacidade ociosa.
-\end{enumerate}
+O Relatório~3 cobrirá quatro pontos. Os parâmetros $\rho_j$ serão calibrados
+com dados reais de churn de clientes, substituindo os valores ilustrativos
+usados aqui. A análise de sensibilidade será completada com intervalos exatos
+de ranging para todos os coeficientes da função objetivo e do lado direito das
+restrições. O plano atual informado pelo PCP será confrontado com os registros
+do sistema de gestão, para verificar as horas ociosas reportadas. Por fim, o
+relatório discutirá alternativas para ocupar a capacidade ociosa identificada,
+incluindo possíveis ações comerciais e de portfólio.
 
 \newpage
