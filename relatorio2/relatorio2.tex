@@ -1,99 +1,132 @@
-% =============================================================================
-% RELATÓRIO 2  —  Entrega: 13/05/2026
-% Conteúdo obrigatório:
-%   • Formulação matemática completa
-%   • Estudo bibliográfico do problema e da técnica
-%   • Primeiros resultados + análise preliminar
-% =============================================================================
+%==============================================================================
+%  RELATÓRIO 2
+%  Entrega: 13/05/2026
+%==============================================================================
 
-\section{Relatório 2 -- Formulação Matemática e Primeiros Resultados}
+\clearpage
+\section{Relatório 2: Formulação Matemática e Primeiros Resultados}
 
-% -----------------------------------------------------------------------------
-\subsection{Revisão da Literatura}
-% Estudo bibliográfico:
-%   • Contexto do problema na literatura de PO
-%   • Trabalhos anteriores que tratam problemas similares
-%   • Justificativa da técnica escolhida
+\subsection{Introdução}
 
-\subsubsection{Contextualização do Problema na Literatura}
-\lipsum[1-2]
+O presente relatório constitui a segunda etapa do projeto prático da disciplina
+PRO3341. Com base na concepção desenvolvida no Relatório 1, esta etapa apresenta
+três contribuições principais: (i) a formulação matemática completa e validada
+do modelo de Programação Linear para o problema de mix de produção da Rentex
+Indústria Têxtil LTDA; (ii) o estudo bibliográfico que fundamenta a escolha da
+técnica; e (iii) os primeiros resultados computacionais com análise preliminar.
 
-\subsubsection{Técnica de Resolução Adotada e Justificativa}
-\lipsum[3]
+Os dados utilizados na formulação foram refinados em levantamento conduzido
+junto ao setor de Planejamento e Controle da Produção (PCP) da Rentex, substituindo
+as estimativas iniciais do Relatório 1 por valores reais do sistema de gestão da
+empresa referentes ao mês de março de 2026.
 
-% -----------------------------------------------------------------------------
-\subsection{Formulação Matemática Completa}
+\newpage
+%==============================================================================
+\subsection{Revisão Bibliográfica}
+%==============================================================================
 
-\subsubsection{Conjuntos e Índices}
-\begin{description}[leftmargin=2cm]
-  \item[$I$] Conjunto de \ldots
-  \item[$J$] Conjunto de \ldots
-\end{description}
+\subsubsection{O Problema de Definição do Mix de Produção}
 
-\subsubsection{Parâmetros}
-\begin{description}[leftmargin=2cm]
-  \item[$c_{ij}$] Custo de \ldots
-  \item[$b_i$]    Capacidade de \ldots
-  \item[$d_j$]    Demanda de \ldots
-\end{description}
+O problema de definição do mix de produção consiste em determinar as quantidades
+a fabricar de cada produto em um horizonte de planejamento fixo, de forma a
+otimizar um critério de desempenho econômico — normalmente a maximização do lucro
+ou da margem de contribuição total — respeitando os limites de capacidade dos
+recursos produtivos e as restrições de demanda de mercado
+\cite{hillier2006, arenales2007}.
 
-\subsubsection{Variáveis de Decisão}
-\begin{description}[leftmargin=2cm]
-  \item[$x_{ij} \geq 0$] Quantidade de \ldots alocada de $i$ para $j$
-\end{description}
+Do ponto de vista matemático, o problema pertence à classe dos problemas de
+programação linear (PL) quando as quantidades produzidas são tratadas como
+variáveis contínuas, ou à classe da programação linear inteira mista (PLIM)
+quando a indivisibilidade dos lotes é relevante \cite{sobreiro2013}. A
+formulação contínua é adequada para o caso da Rentex, pois os produtos são
+medidos em lotes de 100 metros lineares e a granularidade do lote é suficientemente
+pequena em relação às quantidades semanais planejadas para que a hipótese de
+divisibilidade seja válida.
 
-\subsubsection{Modelo}
-\begin{align}
-  \min \quad        & z = \sum_{i \in I} \sum_{j \in J} c_{ij}\, x_{ij}
-                    \label{eq:fo_r2} \\
-  \text{s.a.} \quad & \sum_{j \in J} x_{ij} \leq b_i,
-                    \quad \forall\, i \in I   \label{eq:cap_r2} \\
-                    & \sum_{i \in I} x_{ij} \geq d_j,
-                    \quad \forall\, j \in J   \label{eq:dem_r2} \\
-                    & x_{ij} \geq 0,
-                    \quad \forall\, i \in I,\; j \in J   \label{eq:nonneg_r2}
-\end{align}
+A Programação Linear tem aplicação consolidada em problemas de planejamento da
+produção em indústrias de processo e manufatura. \textcite{hillier2006} apresentam
+uma derivação completa do método Simplex e sua aplicação a problemas de alocação
+de recursos, que é exatamente a estrutura do problema Rentex. \textcite{arenales2007}
+discutem a PL no contexto de empresas industriais brasileiras, com exemplos de
+mix de produção em setores têxtil, alimentício e metalúrgico.
 
-% Descrição das restrições
-A função objetivo~\eqref{eq:fo_r2} minimiza o custo total.
-As restrições~\eqref{eq:cap_r2} garantem que a capacidade de cada origem não seja excedida.
-As restrições~\eqref{eq:dem_r2} asseguram o atendimento de toda a demanda.
-As restrições~\eqref{eq:nonneg_r2} impõem a não-negatividade.
+\subsubsection{Programação Linear como Técnica de Referência}
 
-% -----------------------------------------------------------------------------
-\subsection{Dados Utilizados}
-% Descreva os dados reais obtidos da empresa.
+A Programação Linear é a técnica mais amplamente utilizada para problemas de
+mix de produção por três razões objetivas:
 
-\subsubsection{Fonte e Coleta dos Dados}
-\lipsum[4]
+\begin{enumerate}[label=\textbf{(\alph*)}]
+  \item \textbf{Garantia de otimalidade global:} o método Simplex, quando aplicado
+        a um problema com função objetivo linear e restrições lineares, encontra
+        o ótimo global com certeza, ao contrário de heurísticas que fornecem apenas
+        aproximações \cite{hillier2006}.
 
-\subsubsection{Tratamento e Preparação dos Dados}
-\lipsum[5]
+  \item \textbf{Informações de análise de sensibilidade:} a solução ótima de um
+        problema de PL vem acompanhada de preços-sombra (\textit{shadow prices}),
+        intervalos de otimalidade e relatórios de folga que permitem à gestão
+        avaliar o impacto de variações nos parâmetros sem reprocessar o modelo
+        \cite{winston2002}.
 
-% -----------------------------------------------------------------------------
-\subsection{Primeiros Resultados}
+  \item \textbf{Escala computacional:} problemas com dezenas de variáveis e
+        centenas de restrições são resolvidos em frações de segundo por solvers
+        modernos como Gurobi, CPLEX e CBC \cite{mitchell2011}.
+\end{enumerate}
 
-\subsubsection{Instância de Teste}
-% Descreva a instância utilizada (tamanho, origem dos dados).
-\lipsum[6]
+\textcite{sobreiro2013} utilizam a solução ótima da PL inteira como
+\textit{benchmark} para comparar heurísticas construtivas baseadas na Teoria das
+Restrições, o que reforça o papel da PL como referência de qualidade de solução
+para problemas desta categoria. Em instâncias de pequeno porte (até 8 produtos),
+os autores mostram que a PL inteira encontra o ótimo em menos de 1 segundo,
+tornando desnecessário o uso de heurísticas para o caso Rentex.
 
-\subsubsection{Resultados Obtidos}
-% Tabela de resultados preliminares
-\begin{table}[H]
-  \centering
-  \caption{Primeiros resultados obtidos}
-  \label{tab:resultados_r2}
-  \begin{tabular}{lcc}
-    \toprule
-    Cenário & Valor da FO & Tempo (s) \\
-    \midrule
-    Instância pequena & --- & --- \\
-    Instância média   & --- & --- \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\subsubsection{Teoria das Restrições e Identificação de Gargalos}
 
-\subsubsection{Análise Preliminar}
-\lipsum[7-8]
+A Teoria das Restrições (TOC), desenvolvida por \textcite{goldratt2006}, postula
+que o desempenho de qualquer sistema de produção é determinado por sua restrição
+mais limitante, denominada gargalo. O processo de melhoria contínua da TOC
+prescreve cinco passos: identificar a restrição, explorar a restrição, subordinar
+os demais recursos à restrição, elevar a capacidade da restrição e, se a restrição
+for superada, reiniciar o processo \cite{sobreiro2013}.
+
+No contexto da PL, o gargalo corresponde à restrição com maior preço-sombra na
+solução ótima: a restrição para a qual uma unidade adicional de capacidade gera
+o maior incremento na função objetivo. Essa dualidade entre a TOC e a PL permite
+que os resultados do modelo sejam interpretados em termos gerenciais familiares
+à equipe da Rentex.
+
+\subsubsection{Análise de Sensibilidade em Problemas de Mix}
+
+A análise de sensibilidade é parte indissociável da aplicação da PL em ambiente
+empresarial. \textcite{winston2002} distinguem dois tipos principais de análise:
+
+\begin{itemize}
+  \item \textbf{Análise de ranging de coeficientes da FO:} determina o intervalo
+        dentro do qual o coeficiente de margem de contribuição de um produto pode
+        variar sem que a base ótima mude, ou seja, sem que a combinação de produtos
+        na solução ótima se altere. É diretamente útil para avaliar o impacto de
+        variações de preço ou de custo de matéria-prima.
+
+  \item \textbf{Análise de ranging do lado direito (RHS):} determina o intervalo
+        de variação da capacidade de cada recurso para o qual os preços-sombra
+        permanecem válidos. Essa análise orienta decisões sobre investimento em
+        capacidade adicional (horas extras, subcontratação, compra de equipamento).
+\end{itemize}
+
+\textcite{arenales2007} demonstram que, para problemas de mix de produção em
+manufatura, a análise de sensibilidade do RHS é frequentemente mais valiosa do
+que a solução ótima em si, pois as capacidades são os parâmetros sobre os quais
+a gestão tem maior controle de curto prazo.
+
+\subsubsection{Justificativa Final da Técnica}
+
+Considerando as características do problema Rentex, a Programação Linear contínua
+foi selecionada como técnica principal por ser: (i) a técnica que fornece a solução
+ótima garantida para o problema formulado; (ii) capaz de fornecer, além do plano
+de produção, a análise de sensibilidade necessária para decisões táticas; e
+(iii) implementável de forma transparente e auditável em Python, facilitando a
+adoção pela equipe de PCP da empresa.
+
+A PLI será utilizada como análise complementar para avaliar o impacto da
+hipótese de divisibilidade, conforme anunciado no Relatório 1.
 
 \newpage
