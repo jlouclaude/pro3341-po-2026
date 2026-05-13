@@ -12,11 +12,18 @@ técnica, a formulação matemática completa e aprimorada do modelo de
 Programação Linear para o problema de mix de produção da Rentex, e os
 primeiros resultados computacionais com análise preliminar.
 
-A formulação foi enriquecida em relação à concepção inicial para capturar o
-elemento central do problema: o \textbf{trade-off entre maximizar margem de
-contribuição no curto prazo e manter parcerias de longo prazo com clientes
-contratuais de menor margem}. Esse elemento distingue o problema da Rentex de
-um simples problema de alocação, tornando o uso de Programação Linear
+A formulação foi aprimorada em relação à concepção inicial a partir das
+observações do monitor da disciplina, Lauro Solia, que identificou dois pontos
+centrais no Relatório 1: (i) um modelo com apenas demanda mínima contratual como
+restrição dura produziria um resultado trivialmente previsível por inspeção,
+dispensando o uso de Programação Linear; e (ii) o artigo de referência havia sido
+anexado sem discussão sobre sua metodologia e conexão com o projeto. Ambos os
+pontos foram endereçados neste relatório.
+
+A reformulação captura o elemento central do problema: o \textbf{trade-off entre
+maximizar margem de contribuição no curto prazo e manter parcerias de longo prazo
+com clientes contratuais de menor margem}. Esse elemento distingue o problema da
+Rentex de um simples problema de alocação, tornando o uso de Programação Linear
 genuinamente necessário para derivar a política ótima.
 
 \newpage
@@ -318,6 +325,22 @@ para aumentar a produção dos forros ou das sarjas, conforme detalhado na anál
 
 \subsection{Implementação Computacional}
 \label{sec:impl}
+
+\subsubsection{Ambiente e Ferramentas}
+
+O modelo foi implementado em Python~3.11 com a biblioteca \texttt{PuLP~2.7} e
+o solver CBC~2.10 \cite{mitchell2011}, executado em computador com processador
+Intel Core i5, 16~GB RAM e sistema operacional Ubuntu~22.04.
+
+O desenvolvimento do código contou com o auxílio do modelo de linguagem
+\textbf{Claude} (Anthropic, versão Sonnet~4), utilizado como assistente de
+programação para estruturação do modelo, verificação da formulação e geração
+dos experimentos de análise de sensibilidade. O código produzido foi revisado
+e validado pelos integrantes do grupo antes da execução, garantindo a
+correspondência entre a implementação e a formulação matemática apresentada na
+Seção~\ref{sec:form_final}.
+
+\subsubsection{Código}
 
 \begin{lstlisting}[caption={Modelo PL aprimorado da Rentex -- \texttt{rentex\_pl.py}},
                    label={lst:rentex}]
