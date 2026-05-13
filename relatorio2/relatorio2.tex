@@ -307,3 +307,144 @@ A lacuna entre 44 h (mínimo contratual) e 380 h (capacidade total) é justament
 o espaço onde o modelo otimiza a alocação entre sarjas e forros adicionais.
 
 \newpage
+\subsection{Implementação Computacional}
+\label{sec:impl}
+
+\subsubsection{Ambiente}
+
+O modelo foi implementado em Python 3.11 com a biblioteca \texttt{PuLP 2.7} e
+o solver CBC 2.10 \cite{mitchell2011}, executado em computador com processador
+Intel Core i5, 16~GB RAM e sistema operacional Ubuntu 22.04. O código completo
+encontra-se no arquivo \texttt{codigo/rentex\_pl.py} do repositório do projeto.
+
+\subsubsection{Código}
+
+\begin{lstlisting}[caption={Modelo PL da Rentex -- \texttt{rentex\_pl.py}},
+                   label={lst:rentex}]
+"""
+PRO3341 - Projeto Rentex: Otimizacao do Mix de Producao
+"""
+import pulp
+
+# === DADOS ===
+produtos = ['Sarja_Barcelos', 'Sarja_Joy', 'Forro_Padrao', 'Forro_Premium']
+recursos = ['Teares', 'Fio_Algodao', 'Fio_Poliester', 'Elastano', 'MOD']
+
+MC = {'Sarja_Barcelos': 700, 'Sarja_Joy': 1000,
+      'Forro_Padrao': 220, 'Forro_Premium': 350}
+
+b = {'Teares': 380, 'Fio_Algodao': 400, 'Fio_Poliester': 500,
+     'Elastano': 12, 'MOD': 1200}
+
+a = {
+    'Teares':       {'Sarja_Barcelos':0.85,'Sarja_Joy':1.40,
+                     'Forro_Padrao':0.50,'Forro_Premium':0.70},
+    'Fio_Algodao':  {'Sarja_Barcelos':1.35,'Sarja_Joy':0.95,
+                     'Forro_Padrao':0.00,'Forro_Premium':0.00},
+    'Fio_Poliester':{'Sarja_Barcelos':0.00,'Sarja_Joy':0.35,
+                     'Forro_Padrao':1.60,'Forro_Premium':1.55},
+    'Elastano':     {'Sarja_Barcelos':0.00,'Sarja_Joy':0.07,
+                     'Forro_Padrao':0.00,'Forro_Premium':0.08},
+    'MOD':          {'Sarja_Barcelos':0.40,'Sarja_Joy':0.65,
+                     'Forro_Padrao':0.25,'Forro_Premium':0.35},
+}
+
+d_min = {'Sarja_Barcelos':  0, 'Sarja_Joy':  0,
+         'Forro_Padrao': 60, 'Forro_Premium': 20}
+d_max = {'Sarja_Barcelos':200, 'Sarja_Joy': 80,
+         'Forro_Padrao':160, 'Forro_Premium': 60}
+
+# === MODELO ===
+prob = pulp.LpProblem("Rentex_Mix", pulp.LpMaximize)
+x = {j: pulp.LpVariable(f"x_{j}", lowBound=0) for j in produtos}
+
+prob += pulp.lpSum(MC[j] * x[j] for j in produtos), "MC_Total"
+
+for i in recursos:
+    prob += (pulp.lpSum(a[i][j] * x[j] for j in produtos) <= b[i],
+             f"Cap_{i}")
+
+for j in produtos:
+    prob += x[j] >= d_min[j], f"Min_{j}"
+    prob += x[j] <= d_max[j], f"Max_{j}"
+
+# === SOLUCAO ===
+prob.solve(pulp.PULP_CBC_CMD(msg=0))
+
+print(f"Status : {pulp.LpStatus[prob.status]}")
+print(f"Z*     : R$ {pulp.value(prob.objective):,.2f}/semana")
+
+for j in produtos:
+    xv = pulp.value(x[j])
+    print(f"  {j}: {xv:.2f} lotes  (MC={MC[j]*xv:,.2f})")
+
+for name, c in prob.constraints.items():
+    if 'Cap' in name:
+        rec = name.replace('Cap_', '')
+        uso = sum(a[rec][j] * pulp.value(x[j]) for j in produtos)
+        pi  = -c.pi if c.pi is not None else 0.0
+        print(f"  {rec}: uso={uso:.2f}  folga={b[rec]-uso:.2f}  pi=R${pi:.2f}")
+\end{lstlisting}
+
+\newpage
+\subsection{Primeiros Resultados}
+\label{sec:resultados_r2}
+
+\subsubsection{Solução Ótima}
+
+O modelo foi resolvido em menos de 0,01 segundo com status \textit{Optimal}.
+A Tabela~\ref{tab:sol_r2} apresenta o plano de produção semanal ótimo.
+
+\begin{table}[H]
+\centering
+\caption{Plano de produção semanal ótimo}
+\label{tab:sol_r2}
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{$j$} & \textbf{Produto} & \textbf{$x_j^*$} & \textbf{$d_j^{\min}$} & \textbf{$d_j^{\max}$} & \textbf{MC total (R\$)} \\
+\midrule
+1 & Sarja Barcelos  & 200 & 0  & 200 & 140.000,00 \\
+2 & Sarja Joy       &  80 & 0  &  80 &  80.000,00 \\
+3 & Forro Padrão    & 112 & 60 & 160 &  24.640,00 \\
+4 & Forro Premium   &  60 & 20 &  60 &  21.000,00 \\
+\midrule
+  & \textbf{Total}  & \textbf{452} & & & \textbf{265.640,00} \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize $Z^* = \text{R\$}~265.640,00/\text{semana}$.}
+\end{tabular}
+\end{table}
+
+O plano ótimo determina a produção máxima de Sarja Barcelos (200 lotes) e Sarja
+Joy (80 lotes), a produção máxima de Forro Premium (60 lotes) e a produção
+parcial de Forro Padrão (112 lotes, acima do mínimo contratual de 60). O Forro
+Padrão é o único produto que não atinge sua demanda máxima de mercado: dos 160
+lotes possíveis, somente 112 são produzidos, pois a capacidade dos teares se
+esgota antes de atender a demanda total.
+
+\subsubsection{Utilização dos Recursos}
+
+\begin{table}[H]
+\centering
+\caption{Utilização dos recursos produtivos na solução ótima}
+\label{tab:util_r2}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Recurso} & \textbf{Uso} & \textbf{Capacidade} & \textbf{Folga} & \textbf{Ocup. (\%)} \\
+\midrule
+Teares (h)            & 380,0 & 380 &   0,0 & \textbf{100,0\%} \\
+Fio algodão (kg)      & 346,0 & 400 &  54,0 & 86,5\% \\
+Fio poliéster (kg)    & 300,2 & 500 & 199,8 & 60,0\% \\
+Elastano (kg)         &  10,4 &  12 &   1,6 & 86,7\% \\
+Mão de obra (h)       & 181,0 & 1.200 & 1.019,0 & 15,1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+O recurso Teares está completamente saturado (folga nula), confirmando-o como
+o único gargalo ativo da operação. Os demais recursos apresentam folgas
+expressivas: fio de poliéster utiliza apenas 60,0\% da capacidade, e a mão de
+obra direta encontra-se amplamente ociosa (15,1\% de utilização). Isso indica
+que aumentos de produção dependem exclusivamente de expansão da capacidade de
+tear, e não de contratações ou de reposição de matéria-prima.
+
+\newpage
