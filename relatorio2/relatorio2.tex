@@ -1,817 +1,122 @@
 %==============================================================================
-%  RELATÓRIO 2
-%  Entrega: 13/05/2026
+%  RELATÓRIO 2  —  Entrega: 13/05/2026
 %==============================================================================
 
-\clearpage
 \section{Relatório 2: Formulação Matemática e Primeiros Resultados}
 
 \subsection{Introdução}
 
-O presente relatório constitui a segunda etapa do projeto prático da disciplina
-PRO3341. Com base na concepção desenvolvida no Relatório 1, esta etapa apresenta
-três contribuições principais: (i) a formulação matemática completa e validada
-do modelo de Programação Linear para o problema de mix de produção da Rentex
-Indústria Têxtil LTDA; (ii) o estudo bibliográfico que fundamenta a escolha da
-técnica; e (iii) os primeiros resultados computacionais com análise preliminar.
+Este relatório apresenta a segunda etapa do projeto. Com base na concepção
+desenvolvida no Relatório 1, são apresentados: a revisão bibliográfica que
+fundamenta a técnica escolhida, a formulação matemática completa e validada do
+modelo de Programação Linear para o problema de mix de produção da Rentex, e os
+primeiros resultados computacionais com análise preliminar.
 
-Os dados utilizados na formulação foram refinados em levantamento conduzido
-junto ao setor de Planejamento e Controle da Produção (PCP) da Rentex, substituindo
-as estimativas iniciais do Relatório 1 por valores reais do sistema de gestão da
-empresa referentes ao mês de março de 2026.
+Os parâmetros do modelo foram refinados em levantamento conduzido junto ao setor
+de Planejamento e Controle da Produção (PCP) da Rentex, substituindo as
+estimativas conceituais do Relatório 1 por valores reais extraídos do sistema de
+gestão da empresa.
 
 \newpage
-%==============================================================================
+
 \subsection{Revisão Bibliográfica}
-%==============================================================================
+\label{sec:biblio}
 
 \subsubsection{O Problema de Definição do Mix de Produção}
 
 O problema de definição do mix de produção consiste em determinar as quantidades
 a fabricar de cada produto em um horizonte de planejamento fixo, de forma a
-otimizar um critério de desempenho econômico — normalmente a maximização do lucro
-ou da margem de contribuição total — respeitando os limites de capacidade dos
-recursos produtivos e as restrições de demanda de mercado
+maximizar a margem de contribuição total, respeitando os limites de capacidade
+dos recursos produtivos e as restrições de demanda de mercado
 \cite{hillier2006, arenales2007}.
 
-Do ponto de vista matemático, o problema pertence à classe dos problemas de
-programação linear (PL) quando as quantidades produzidas são tratadas como
-variáveis contínuas, ou à classe da programação linear inteira mista (PLIM)
-quando a indivisibilidade dos lotes é relevante \cite{sobreiro2013}. A
-formulação contínua é adequada para o caso da Rentex, pois os produtos são
-medidos em lotes de 100 metros lineares e a granularidade do lote é suficientemente
-pequena em relação às quantidades semanais planejadas para que a hipótese de
-divisibilidade seja válida.
+Do ponto de vista matemático, quando as quantidades são tratadas como variáveis
+contínuas, o problema se enquadra na Programação Linear (PL). Quando a
+indivisibilidade dos lotes é relevante, trata-se de Programação Linear Inteira
+Mista (PLIM) \cite{sobreiro2013}. A PL contínua é adequada para o caso da Rentex:
+os produtos são medidos em lotes de 100 metros lineares e, dado o volume semanal
+de produção, a hipótese de divisibilidade é válida.
 
-A Programação Linear tem aplicação consolidada em problemas de planejamento da
-produção em indústrias de processo e manufatura. \textcite{hillier2006} apresentam
-uma derivação completa do método Simplex e sua aplicação a problemas de alocação
-de recursos, que é exatamente a estrutura do problema Rentex. \textcite{arenales2007}
-discutem a PL no contexto de empresas industriais brasileiras, com exemplos de
-mix de produção em setores têxtil, alimentício e metalúrgico.
+A formulação geral do problema de mix de produção -- apresentada por
+\textcite{sobreiro2013} e diretamente adotada neste trabalho -- é:
 
-\subsubsection{Programação Linear como Técnica de Referência}
+\begin{align}
+  &\text{Maximizar} \quad Z = \sum_{j=1}^{n} (P_j - c_j)\, x_j \nonumber \\[4pt]
+  &\text{s.a.} \quad \sum_{j=1}^{n} a_{ij}\, x_j \leq b_i, \quad i = 1, \ldots, m \nonumber \\[2pt]
+  &\phantom{\text{s.a.}} \quad x_j \leq d_j^{\max},\quad x_j \geq d_j^{\min}, \quad j = 1, \ldots, n \nonumber
+\end{align}
 
-A Programação Linear é a técnica mais amplamente utilizada para problemas de
-mix de produção por três razões objetivas:
+onde $P_j$ é o preço de venda, $c_j$ o custo variável, $a_{ij}$ o consumo do
+recurso $i$ por unidade do produto $j$, $b_i$ a capacidade disponível e
+$d_j^{\min}, d_j^{\max}$ os limites de demanda do produto $j$. A restrição de
+demanda mínima, ausente na formulação clássica mas presente neste modelo, captura
+os contratos de fornecimento obrigatório dos forros.
+
+\subsubsection{Programação Linear como Técnica Principal}
+
+A Programação Linear é a técnica dominante para problemas de mix de produção em
+horizonte de curto prazo por razões objetivas:
 
 \begin{enumerate}[label=\textbf{(\alph*)}]
-  \item \textbf{Garantia de otimalidade global:} o método Simplex, quando aplicado
-        a um problema com função objetivo linear e restrições lineares, encontra
-        o ótimo global com certeza, ao contrário de heurísticas que fornecem apenas
+  \item \textbf{Garantia de otimalidade global:} o método Simplex encontra o ótimo
+        global com certeza, ao contrário de heurísticas que fornecem apenas
         aproximações \cite{hillier2006}.
 
-  \item \textbf{Informações de análise de sensibilidade:} a solução ótima de um
-        problema de PL vem acompanhada de preços-sombra (\textit{shadow prices}),
-        intervalos de otimalidade e relatórios de folga que permitem à gestão
-        avaliar o impacto de variações nos parâmetros sem reprocessar o modelo
-        \cite{winston2002}.
+  \item \textbf{Análise de sensibilidade nativa:} a solução ótima vem acompanhada
+        de preços-sombra e intervalos de ranging que permitem avaliar o impacto de
+        variações nos parâmetros sem reprocessar o modelo \cite{winston2002}.
+        Essa informação é diretamente útil para decisões táticas como negociação
+        de horas extras e compra de estoque adicional de fios.
 
-  \item \textbf{Escala computacional:} problemas com dezenas de variáveis e
-        centenas de restrições são resolvidos em frações de segundo por solvers
-        modernos como Gurobi, CPLEX e CBC \cite{mitchell2011}.
+  \item \textbf{Escala e velocidade:} problemas com dezenas de variáveis são
+        resolvidos em frações de segundo por solvers modernos \cite{mitchell2011}.
 \end{enumerate}
 
-\textcite{sobreiro2013} utilizam a solução ótima da PL inteira como
-\textit{benchmark} para comparar heurísticas construtivas baseadas na Teoria das
-Restrições, o que reforça o papel da PL como referência de qualidade de solução
-para problemas desta categoria. Em instâncias de pequeno porte (até 8 produtos),
-os autores mostram que a PL inteira encontra o ótimo em menos de 1 segundo,
-tornando desnecessário o uso de heurísticas para o caso Rentex.
+\textcite{sobreiro2013} adotam a solução ótima da PL inteira como referência de
+qualidade (\textit{benchmark}) para comparar heurísticas construtivas. Para o
+porte do problema da Rentex (4 produtos, 5 recursos), a PL encontra a solução
+ótima instantaneamente, tornando desnecessário o uso de qualquer heurística.
 
 \subsubsection{Teoria das Restrições e Identificação de Gargalos}
 
-A Teoria das Restrições (TOC), desenvolvida por \textcite{goldratt2006}, postula
-que o desempenho de qualquer sistema de produção é determinado por sua restrição
-mais limitante, denominada gargalo. O processo de melhoria contínua da TOC
-prescreve cinco passos: identificar a restrição, explorar a restrição, subordinar
-os demais recursos à restrição, elevar a capacidade da restrição e, se a restrição
-for superada, reiniciar o processo \cite{sobreiro2013}.
+A Teoria das Restrições (TOC), desenvolvida por \textcite{goldratt2006}, identifica
+que o desempenho de qualquer sistema é limitado por sua restrição mais crítica.
+No contexto da PL, o gargalo é o recurso com maior preço-sombra na solução ótima:
+aquele para o qual uma unidade adicional de capacidade gera o maior incremento na
+margem de contribuição total.
 
-No contexto da PL, o gargalo corresponde à restrição com maior preço-sombra na
-solução ótima: a restrição para a qual uma unidade adicional de capacidade gera
-o maior incremento na função objetivo. Essa dualidade entre a TOC e a PL permite
-que os resultados do modelo sejam interpretados em termos gerenciais familiares
-à equipe da Rentex.
+A conexão entre TOC e PL é evidenciada pelo trabalho de \textcite{sobreiro2013},
+que utiliza o gargalo identificado pela TOC para construir a sequência de
+prioridade de produção de sua heurística. Neste projeto, a informação de gargalo
+é extraída diretamente da solução ótima da PL, permitindo uma análise gerencial
+acessível para a equipe da Rentex.
 
-\subsubsection{Análise de Sensibilidade em Problemas de Mix}
+\subsubsection{Tratamento do Tempo de Setup na Formulação PL}
 
-A análise de sensibilidade é parte indissociável da aplicação da PL em ambiente
-empresarial. \textcite{winston2002} distinguem dois tipos principais de análise:
+O Relatório 1 identificou os tempos de setup como um elemento relevante do problema,
+especialmente para a Sarja Joy, que requer troca de urdume e trama nos teares.
+Na PL, o setup é incorporado por meio do coeficiente técnico ajustado
+$a_{1j}^{\text{ajust}}$, definido como:
 
-\begin{itemize}
-  \item \textbf{Análise de ranging de coeficientes da FO:} determina o intervalo
-        dentro do qual o coeficiente de margem de contribuição de um produto pode
-        variar sem que a base ótima mude, ou seja, sem que a combinação de produtos
-        na solução ótima se altere. É diretamente útil para avaliar o impacto de
-        variações de preço ou de custo de matéria-prima.
+\begin{equation}
+  a_{1j}^{\text{ajust}} = a_{1j}^{\text{ciclo}} + \frac{S_j}{Q_j^{\min}}
+  \label{eq:setup}
+\end{equation}
 
-  \item \textbf{Análise de ranging do lado direito (RHS):} determina o intervalo
-        de variação da capacidade de cada recurso para o qual os preços-sombra
-        permanecem válidos. Essa análise orienta decisões sobre investimento em
-        capacidade adicional (horas extras, subcontratação, compra de equipamento).
-\end{itemize}
-
-\textcite{arenales2007} demonstram que, para problemas de mix de produção em
-manufatura, a análise de sensibilidade do RHS é frequentemente mais valiosa do
-que a solução ótima em si, pois as capacidades são os parâmetros sobre os quais
-a gestão tem maior controle de curto prazo.
+onde $a_{1j}^{\text{ciclo}}$ é o tempo de ciclo puro por lote, $S_j$ é o tempo
+de setup por troca e $Q_j^{\min}$ é o tamanho mínimo de lote contratual. Essa
+abordagem amortiza o setup sobre o lote mínimo, fornecendo um coeficiente
+conservador que incorpora o custo do tempo de preparação sem introduzir variáveis
+binárias (o que converteria o problema em PLIM) \cite{arenales2007}.
 
 \subsubsection{Justificativa Final da Técnica}
 
-Considerando as características do problema Rentex, a Programação Linear contínua
-foi selecionada como técnica principal por ser: (i) a técnica que fornece a solução
-ótima garantida para o problema formulado; (ii) capaz de fornecer, além do plano
-de produção, a análise de sensibilidade necessária para decisões táticas; e
-(iii) implementável de forma transparente e auditável em Python, facilitando a
-adoção pela equipe de PCP da empresa.
-
-A PLI será utilizada como análise complementar para avaliar o impacto da
-hipótese de divisibilidade, conforme anunciado no Relatório 1.
-
-\newpage
-%==============================================================================
-\subsection{Coleta e Validação dos Dados}
-%==============================================================================
-
-Esta seção descreve o processo de levantamento e refinamento dos dados utilizados
-na formulação final do modelo, realizado em duas visitas técnicas à planta da
-Rentex em março de 2026.
-
-\subsubsection{Fontes de Dados}
-
-Os dados foram obtidos a partir de três fontes complementares:
-
-\begin{enumerate}[label=\textbf{(\roman*)}]
-  \item \textbf{Sistema ERP da empresa (módulo PCP):} roteiros de fabricação com
-        tempos padrão por operação, por produto e por máquina, expressos em
-        horas por lote de 100 metros lineares.
-
-  \item \textbf{Relatórios mensais de capacidade:} histórico de março de 2025 a
-        fevereiro de 2026, utilizados para calcular a disponibilidade semanal média
-        de cada recurso após descontar manutenções programadas e tempos de setup.
-
-  \item \textbf{Planilhas de custo de produto:} fichas de custo elaboradas pelo
-        departamento financeiro, com discriminação de matéria-prima (fio, corantes,
-        auxiliares químicos), mão de obra direta e custos variáveis de utilidade
-        (energia, vapor, água).
-\end{enumerate}
-
-\subsubsection{Capacidades Disponíveis Validadas}
-
-A disponibilidade semanal de cada recurso foi calculada como a média das últimas
-12 semanas completas de operação, descontando paradas programadas. O regime de
-trabalho é de segunda a sábado em dois turnos de 8 horas, com 30 minutos de
-pausa por turno. A Tabela~\ref{tab:cap_valid} apresenta os valores obtidos.
-
-\begin{table}[H]
-\centering
-\caption{Capacidades semanais disponíveis validadas}
-\label{tab:cap_valid}
-\begin{tabular}{clccc}
-\toprule
-\textbf{$i$} & \textbf{Recurso} & \textbf{Capacidade bruta} & \textbf{Eficiência} & \textbf{$b_i$ (disponível)} \\
-\midrule
-1 & Teares (h)               & 1.344 h & 88\% & 1.183 h \\
-2 & Tinturaria (h)           &   864 h & 90\% &   778 h \\
-3 & Acabamento (h)           &   672 h & 85\% &   571 h \\
-4 & Matéria-prima -- fio (kg)& 16.000 kg & 100\% & 16.000 kg \\
-5 & Mão de obra direta (h)   &   960 h & 93\% &   893 h \\
-\bottomrule
-\multicolumn{5}{l}{\footnotesize Eficiência = fração do tempo bruto efetivamente disponível após setups, manutenções e absenteísmo.}
-\end{tabular}
-\end{table}
-
-Para fins de modelagem, os valores de $b_i$ foram arredondados de forma
-conservadora (para baixo), resultando nos limites definitivos usados no modelo:
-$b_1 = 1.180$~h, $b_2 = 775$~h, $b_3 = 570$~h, $b_4 = 16.000$~kg e
-$b_5 = 890$~h.
-
-\subsubsection{Coeficientes de Consumo Validados}
-
-Os tempos padrão por operação foram extraídos dos roteiros de fabricação do ERP
-e conferidos por cronometragem direta em linha durante a segunda visita técnica.
-A Tabela~\ref{tab:coef_valid} apresenta os coeficientes finais $a_{ij}$.
-
-\begin{table}[H]
-\centering
-\caption{Coeficientes técnicos validados: consumo de recurso $i$ por lote do produto $j$ ($a_{ij}$)}
-\label{tab:coef_valid}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lcccccc}
-\toprule
-\textbf{Recurso $i$} & \textbf{Jersey} & \textbf{Rib} & \textbf{Popeline} & \textbf{Oxford} & \textbf{Denim} & \textbf{Técnico} \\
-\midrule
-Teares (h/lote)        & 1,8 & 2,3 & 2,9 & 3,4 & 4,1 & 3,6 \\
-Tinturaria (h/lote)    & 1,4 & 1,6 & 1,9 & 2,4 & 2,9 & 1,1 \\
-Acabamento (h/lote)    & 0,7 & 0,9 & 1,1 & 1,3 & 1,7 & 2,6 \\
-Fio (kg/lote)          & 17  & 21  & 24  & 29  & 36  & 27  \\
-MOD (h/lote)           & 1,1 & 1,4 & 1,7 & 1,9 & 2,4 & 2,9 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-As diferenças em relação às estimativas do Relatório 1 são pequenas (inferiores
-a 5\% em todos os casos), o que valida a consistência do levantamento inicial.
-A maior variação ocorreu no coeficiente de acabamento do Tecido Técnico
-($a_{3,6}$: 2,5~h/lote estimado vs.\ 2,6~h/lote medido), confirmando que o
-acabamento é de fato o recurso mais restritivo para esse produto.
-
-\subsubsection{Margens de Contribuição Validadas}
-
-A Tabela~\ref{tab:mc_valid} apresenta as margens de contribuição por lote,
-calculadas com base nos preços de tabela praticados em março de 2026 e nas
-fichas de custo variável fornecidas pelo departamento financeiro.
-
-\begin{table}[H]
-\centering
-\caption{Preços, custos variáveis e margens de contribuição por lote (100~m)}
-\label{tab:mc_valid}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Produto} & \textbf{Preço (R\$/lote)} & \textbf{CV (R\$/lote)} & \textbf{MC$_j$ (R\$/lote)} \\
-\midrule
-Malha Jersey    & 275 & 178 &  97 \\
-Malha Rib       & 315 & 196 & 119 \\
-Plano Popeline  & 345 & 218 & 127 \\
-Plano Oxford    & 415 & 255 & 160 \\
-Denim Leve      & 475 & 295 & 180 \\
-Tecido Técnico  & 575 & 352 & 223 \\
-\bottomrule
-\multicolumn{4}{l}{\footnotesize CV = matéria-prima + corantes + energia + MOD (custo variável total).}
-\end{tabular}
-\end{table}
-
-\subsubsection{Demandas Semanais Validadas}
-
-Os limites de demanda foram calibrados com base na média semanal da carteira de
-pedidos firmes dos últimos dois meses e no histórico de pedidos não atendidos por
-falta de capacidade. A Tabela~\ref{tab:dem_valid} apresenta os valores utilizados.
-
-\begin{table}[H]
-\centering
-\caption{Demandas semanais máximas validadas ($d_j$, em lotes de 100~m)}
-\label{tab:dem_valid}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Produto} & \textbf{Demanda média (lotes/sem)} & \textbf{$d_j$ utilizado no modelo} \\
-\midrule
-Malha Jersey    & 185 & 195 \\
-Malha Rib       & 140 & 148 \\
-Plano Popeline  & 112 & 118 \\
-Plano Oxford    &  93 &  98 \\
-Denim Leve      &  74 &  78 \\
-Tecido Técnico  &  55 &  58 \\
-\bottomrule
-\multicolumn{3}{l}{\footnotesize $d_j$ = demanda média + margem de 5\% para atender pedidos spot.}
-\end{tabular}
-\end{table}
-
-\newpage
-%==============================================================================
-\subsection{Formulação Matemática Final}
-\label{sec:formulacao_final}
-%==============================================================================
-
-\subsubsection{Notação}
-
-\begin{description}[leftmargin=2.5cm, style=nextline]
-  \item[Índices]
-    $j \in J = \{1, 2, 3, 4, 5, 6\}$: famílias de produto (Jersey, Rib,
-    Popeline, Oxford, Denim, Técnico). \\
-    $i \in I = \{1, 2, 3, 4, 5\}$: recursos produtivos (Teares, Tinturaria,
-    Acabamento, Fio, MOD).
-
-  \item[Parâmetros]
-    $\mathrm{MC}_j$ \quad margem de contribuição por lote do produto $j$
-    (R\$/lote). \\
-    $a_{ij}$ \quad quantidade do recurso $i$ consumida por lote do produto $j$. \\
-    $b_i$ \quad capacidade disponível do recurso $i$ por semana. \\
-    $d_j$ \quad demanda máxima semanal do produto $j$ (lotes).
-
-  \item[Variável de decisão]
-    $x_j \geq 0$ \quad quantidade de lotes do produto $j$ a produzir na semana.
-\end{description}
-
-\subsubsection{Modelo de Programação Linear}
-
-\textbf{Função objetivo:}
-\begin{equation}
-  \max \quad Z = \sum_{j \in J} \mathrm{MC}_j \, x_j
-  = 97x_1 + 119x_2 + 127x_3 + 160x_4 + 180x_5 + 223x_6
-  \label{eq:fo_r2}
-\end{equation}
-
-\textbf{Restrições de capacidade de recursos} ($\forall\, i \in I$):
-\begin{align}
-  1{,}8x_1 + 2{,}3x_2 + 2{,}9x_3 + 3{,}4x_4 + 4{,}1x_5 + 3{,}6x_6 &\leq 1180
-    \tag{R1 -- Teares} \label{eq:r1}\\[4pt]
-  1{,}4x_1 + 1{,}6x_2 + 1{,}9x_3 + 2{,}4x_4 + 2{,}9x_5 + 1{,}1x_6 &\leq 775
-    \tag{R2 -- Tinturaria} \label{eq:r2}\\[4pt]
-  0{,}7x_1 + 0{,}9x_2 + 1{,}1x_3 + 1{,}3x_4 + 1{,}7x_5 + 2{,}6x_6 &\leq 570
-    \tag{R3 -- Acabamento} \label{eq:r3}\\[4pt]
-  17x_1 + 21x_2 + 24x_3 + 29x_4 + 36x_5 + 27x_6                     &\leq 16000
-    \tag{R4 -- Fio} \label{eq:r4}\\[4pt]
-  1{,}1x_1 + 1{,}4x_2 + 1{,}7x_3 + 1{,}9x_4 + 2{,}4x_5 + 2{,}9x_6 &\leq 890
-    \tag{R5 -- MOD} \label{eq:r5}
-\end{align}
-
-\textbf{Restrições de demanda} ($\forall\, j \in J$):
-\begin{equation}
-  x_1 \leq 195, \quad x_2 \leq 148, \quad x_3 \leq 118,
-  \quad x_4 \leq 98, \quad x_5 \leq 78, \quad x_6 \leq 58
-  \label{eq:dem_r2}
-\end{equation}
-
-\textbf{Não negatividade:}
-\begin{equation}
-  x_j \geq 0, \quad \forall\, j \in J
-  \label{eq:nn_r2}
-\end{equation}
-
-O modelo possui \textbf{6 variáveis de decisão} e \textbf{11 restrições funcionais}
-(5 de recurso e 6 de demanda), resultando em um problema de PL de pequeno porte,
-resolvível de forma exata em tempo computacional negligenciável.
-
-\subsubsection{Verificação da Não Trivialidade}
-
-Para confirmar que o problema não é trivial, verifica-se a viabilidade do plano
-de produção que atende toda a demanda ($x_j = d_j$ para todo $j$):
-
-\begin{align*}
-  \text{Teares:} \quad &1{,}8(195)+2{,}3(148)+2{,}9(118)+3{,}4(98)+4{,}1(78)+3{,}6(58) \\
-  &= 351,0+340,4+342,2+333,2+319,8+208,8 = \mathbf{1895,4} \quad > 1180 \quad \times \\[6pt]
-  \text{Tinturaria:} \quad &1{,}4(195)+1{,}6(148)+1{,}9(118)+2{,}4(98)+2{,}9(78)+1{,}1(58) \\
-  &= 273,0+236,8+224,2+235,2+226,2+63,8 = \mathbf{1259,2} \quad > 775 \quad \times \\[6pt]
-  \text{Acabamento:} \quad &0{,}7(195)+0{,}9(148)+1{,}1(118)+1{,}3(98)+1{,}7(78)+2{,}6(58) \\
-  &= 136,5+133,2+129,8+127,4+132,6+150,8 = \mathbf{810,3} \quad > 570 \quad \times
-\end{align*}
-
-Todos os três primeiros recursos são violados pelo plano de demanda total, com
-as maiores violações nos teares (60\% acima do disponível) e na tinturaria
-(62\% acima). Isso confirma que a empresa opera em regime de escassez de recursos
-e que a escolha do mix de produção tem impacto real e significativo no resultado.
-
-\newpage
-%==============================================================================
-\subsection{Implementação Computacional}
-\label{sec:implementacao}
-%==============================================================================
-
-\subsubsection{Ambiente de Desenvolvimento}
-
-O modelo foi implementado em Python 3.11 utilizando a biblioteca
-\texttt{PuLP 2.7} com o solver CBC 2.10 \cite{mitchell2011}. Os experimentos
-foram executados em computador com processador Intel Core i5-1235U, 16~GB de
-RAM e sistema operacional Ubuntu 22.04.
-
-\subsubsection{Código Completo}
-
-O código a seguir implementa o modelo de PL completo, resolve o problema,
-exibe a solução ótima e realiza a extração manual de informações de análise
-de sensibilidade.
-
-\begin{lstlisting}[caption={Implementação completa do modelo PL para a Rentex -- \texttt{rentex\_pl.py}},
-                   label={lst:modelo_completo}]
-"""
-PRO3341 -- Projeto Rentex: Otimizacao do Mix de Producao
-Modelo de Programacao Linear (PL) com analise de sensibilidade
-"""
-
-import pulp
-import pandas as pd
-
-# ===========================================================================
-# 1. DADOS DO PROBLEMA
-# ===========================================================================
-
-produtos = ['Jersey', 'Rib', 'Popeline', 'Oxford', 'Denim', 'Tecnico']
-recursos = ['Teares', 'Tinturaria', 'Acabamento', 'Fio', 'MOD']
-
-# Margens de contribuicao (R$/lote de 100 m)
-MC = {'Jersey': 97, 'Rib': 119, 'Popeline': 127,
-      'Oxford': 160, 'Denim': 180, 'Tecnico': 223}
-
-# Capacidades semanais disponiveis
-b = {'Teares': 1180, 'Tinturaria': 775, 'Acabamento': 570,
-     'Fio': 16000, 'MOD': 890}
-
-# Coeficientes tecnicos a[recurso][produto]
-a = {
-    'Teares':     {'Jersey':1.8,'Rib':2.3,'Popeline':2.9,
-                   'Oxford':3.4,'Denim':4.1,'Tecnico':3.6},
-    'Tinturaria': {'Jersey':1.4,'Rib':1.6,'Popeline':1.9,
-                   'Oxford':2.4,'Denim':2.9,'Tecnico':1.1},
-    'Acabamento': {'Jersey':0.7,'Rib':0.9,'Popeline':1.1,
-                   'Oxford':1.3,'Denim':1.7,'Tecnico':2.6},
-    'Fio':        {'Jersey': 17,'Rib': 21,'Popeline': 24,
-                   'Oxford': 29,'Denim': 36,'Tecnico': 27},
-    'MOD':        {'Jersey':1.1,'Rib':1.4,'Popeline':1.7,
-                   'Oxford':1.9,'Denim':2.4,'Tecnico':2.9},
-}
-
-# Demandas maximas semanais (lotes)
-d = {'Jersey':195,'Rib':148,'Popeline':118,
-     'Oxford':98,'Denim':78,'Tecnico':58}
-
-# ===========================================================================
-# 2. MODELO PL
-# ===========================================================================
-
-prob = pulp.LpProblem("Rentex_Mix_Producao", pulp.LpMaximize)
-
-# Variaveis de decisao
-x = {j: pulp.LpVariable(f"x_{j}", lowBound=0) for j in produtos}
-
-# Funcao objetivo
-prob += pulp.lpSum(MC[j] * x[j] for j in produtos), "Margem_Contribuicao_Total"
-
-# Restricoes de capacidade
-for i in recursos:
-    prob += (
-        pulp.lpSum(a[i][j] * x[j] for j in produtos) <= b[i],
-        f"Capacidade_{i}"
-    )
-
-# Restricoes de demanda
-for j in produtos:
-    prob += x[j] <= d[j], f"Demanda_{j}"
-
-# ===========================================================================
-# 3. RESOLUCAO
-# ===========================================================================
-
-prob.solve(pulp.PULP_CBC_CMD(msg=0))
-
-# ===========================================================================
-# 4. RESULTADOS
-# ===========================================================================
-
-print("=" * 60)
-print("RESULTADO -- RENTEX MIX DE PRODUCAO")
-print("=" * 60)
-print(f"Status : {pulp.LpStatus[prob.status]}")
-print(f"Z (MC) : R$ {pulp.value(prob.objective):,.2f} / semana")
-print()
-
-# Plano de producao
-print(f"{'Produto':<12} {'Producao':>10} {'Demanda':>10} {'Ocup.%':>8} {'MC Unit':>9} {'MC Total':>12}")
-print("-" * 65)
-z_total = 0
-for j in produtos:
-    xv = pulp.value(x[j])
-    ocup = 100 * xv / d[j]
-    mc_t = MC[j] * xv
-    z_total += mc_t
-    print(f"{j:<12} {xv:>10.1f} {d[j]:>10} {ocup:>7.1f}% {MC[j]:>9} {mc_t:>12,.2f}")
-print("-" * 65)
-print(f"{'TOTAL':>12} {'':>10} {'':>10} {'':>8} {'':>9} {z_total:>12,.2f}")
-
-# Utilizacao dos recursos
-print()
-print(f"{'Recurso':<14} {'Uso':>10} {'Cap.':>10} {'Folga':>10} {'Ocup.%':>8}")
-print("-" * 55)
-for i in recursos:
-    uso = sum(a[i][j] * pulp.value(x[j]) for j in produtos)
-    folga = b[i] - uso
-    ocup = 100 * uso / b[i]
-    print(f"{i:<14} {uso:>10.1f} {b[i]:>10} {folga:>10.1f} {ocup:>7.1f}%")
-
-# Precos-sombra (via restricoes do modelo)
-print()
-print("PRECOS-SOMBRA (shadow prices)")
-print("-" * 45)
-for name, constr in prob.constraints.items():
-    if "Capacidade" in name:
-        recurso = name.replace("Capacidade_", "")
-        pi = -constr.pi if constr.pi is not None else 0.0
-        print(f"  {recurso:<14}: R$ {pi:>8.4f} por unidade adicional")
-\end{lstlisting}
-
-\newpage
-%==============================================================================
-\subsection{Primeiros Resultados}
-\label{sec:resultados}
-%==============================================================================
-
-\subsubsection{Solução Ótima}
-
-O modelo foi resolvido com o solver CBC em tempo inferior a 0,01 segundo,
-atingindo o status \textit{Optimal}. A Tabela~\ref{tab:solucao_otima} apresenta
-o plano de produção ótimo.
-
-\begin{table}[H]
-\centering
-\caption{Plano de produção ótimo semanal}
-\label{tab:solucao_otima}
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Produto} & \textbf{$x_j^*$ (lotes)} & \textbf{Demanda $d_j$} & \textbf{Atend. (\%)} & \textbf{MC total (R\$)} \\
-\midrule
-Malha Jersey    & 195,0 & 195 & 100,0\% & 18.915,00 \\
-Malha Rib       & 148,0 & 148 & 100,0\% & 17.612,00 \\
-Plano Popeline  &   0,0 & 118 &   0,0\% &      0,00 \\
-Plano Oxford    &  82,3 &  98 &  84,0\% & 13.167,06 \\
-Denim Leve      &   0,0 &  78 &   0,0\% &      0,00 \\
-Tecido Técnico  &  58,0 &  58 & 100,0\% & 12.934,00 \\
-\midrule
-\textbf{Total}  & \textbf{483,3} & \textbf{595} & \textbf{81,2\%} & \textbf{62.628,06} \\
-\bottomrule
-\multicolumn{5}{l}{\footnotesize $^*$ Valor ótimo da função objetivo: $Z^* = \text{R\$}~62.628,06$/semana.}
-\end{tabular}
-\end{table}
-
-O plano ótimo determina que quatro dos seis produtos devem ser fabricados:
-Jersey, Rib, Oxford e Técnico. O Popeline e o Denim ficam completamente fora do
-plano, apesar de possuírem margens de contribuição positivas (R\$\,127 e R\$\,180
-por lote, respectivamente).
-
-\subsubsection{Utilização dos Recursos}
-
-A Tabela~\ref{tab:utilizacao} apresenta a utilização de cada recurso produtivo
-na solução ótima.
-
-\begin{table}[H]
-\centering
-\caption{Utilização dos recursos produtivos na solução ótima}
-\label{tab:utilizacao}
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Recurso} & \textbf{Uso} & \textbf{Capacidade} & \textbf{Folga} & \textbf{Ocup. (\%)} \\
-\midrule
-Teares (h)               & 1.180,0 & 1.180 &   0,0 & \textbf{100,0\%} \\
-Tinturaria (h)           &   771,1 &   775 &   3,9 & 99,5\% \\
-Acabamento (h)           &   527,5 &   570 &  42,5 & 92,5\% \\
-Fio (kg)                 & 10.375,5 & 16.000 & 5.624,5 & 64,8\% \\
-Mão de obra direta (h)   &   746,3 &   890 & 143,7 & 83,9\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-O recurso \textbf{Teares} está completamente saturado (100\% de utilização, folga
-nula), confirmando-o como o gargalo da operação semanal. A tinturaria opera com
-folga mínima de apenas 3,9 horas (99,5\% de ocupação), configurando-se como um
-segundo recurso crítico que pode se tornar gargalo em semanas de maior demanda ou
-com ajustes no mix. Fio e MOD apresentam folgas expressivas, indicando que a
-restrição ao crescimento da produção não está nesses recursos.
-
-\newpage
-%==============================================================================
-\subsection{Análise Preliminar}
-\label{sec:analise_preliminar}
-%==============================================================================
-
-\subsubsection{Interpretação da Solução Ótima}
-
-A exclusão do Popeline e do Denim do plano ótimo é contraintuitiva à primeira
-vista, uma vez que ambos apresentam margens de contribuição positivas. A explicação
-reside na relação entre margem de contribuição e consumo do recurso gargalo
-(Teares), que é a métrica relevante quando há escassez de capacidade.
-
-A Tabela~\ref{tab:eficiencia_tear} apresenta a eficiência de cada produto em
-termos de receita gerada por hora de tear consumida, calculada como
-$e_j = \mathrm{MC}_j / a_{1j}$.
-
-\begin{table}[H]
-\centering
-\caption{Eficiência de cada produto em relação ao recurso gargalo (Teares)}
-\label{tab:eficiencia_tear}
-\begin{tabular}{lrrrr}
-\toprule
-\textbf{Produto} & \textbf{MC$_j$ (R\$/lote)} & \textbf{$a_{1j}$ (h/lote)} & \textbf{$e_j$ (R\$/h tear)} & \textbf{Posição} \\
-\midrule
-Tecido Técnico  & 223 & 3,6 & 61,94 & 1\textordmasculine \\
-Malha Jersey    &  97 & 1,8 & 53,89 & 2\textordmasculine \\
-Malha Rib       & 119 & 2,3 & 51,74 & 3\textordmasculine \\
-Plano Oxford    & 160 & 3,4 & 47,06 & 4\textordmasculine \\
-Plano Popeline  & 127 & 2,9 & 43,79 & 5\textordmasculine \\
-Denim Leve      & 180 & 4,1 & 43,90 & 6\textordmasculine \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-O Denim apresenta a pior eficiência em relação ao gargalo (R\$\,43,90/h), ligeiramente
-abaixo do Popeline (R\$\,43,79/h). O modelo aloca a capacidade restante dos teares
-ao Oxford (4\textordmasculine\ em eficiência) depois de atender integralmente a demanda
-dos três produtos mais eficientes (Técnico, Jersey e Rib). Após o Oxford parcialmente
-atendido, a capacidade dos teares se esgota sem que sobre espaço para o Popeline ou
-o Denim, que possuem eficiências mais baixas. Esse resultado é consistente com o
-princípio de exploração do gargalo da Teoria das Restrições \cite{sobreiro2013}.
-
-\subsubsection{Preços-Sombra e Identificação do Gargalo}
-
-O preço-sombra (\textit{shadow price}) de um recurso mede o incremento na
-margem de contribuição total obtido pela disponibilização de uma unidade adicional
-desse recurso, mantidos todos os demais parâmetros constantes \cite{winston2002}.
-
-A Tabela~\ref{tab:precos_sombra} apresenta os preços-sombra obtidos na solução ótima.
-
-\begin{table}[H]
-\centering
-\caption{Preços-sombra dos recursos produtivos}
-\label{tab:precos_sombra}
-\begin{tabular}{lrrl}
-\toprule
-\textbf{Recurso} & \textbf{Folga (h ou kg)} & \textbf{Preço-sombra (R\$/unidade)} & \textbf{Interpretação} \\
-\midrule
-Teares (h)             &   0,0 & \textbf{47,06} & Gargalo: cada hora extra vale R\$\,47,06 \\
-Tinturaria (h)         &   3,9 &   0,00 & Não gargalo: folga positiva \\
-Acabamento (h)         &  42,5 &   0,00 & Não gargalo: folga expressiva \\
-Fio (kg)               & 5.624,5 & 0,00 & Abundante: sem restrição ativa \\
-Mão de obra direta (h) & 143,7 &   0,00 & Não gargalo: folga expressiva \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Somente o recurso Teares possui preço-sombra positivo (R\$\,47,06/h), confirmando-o
-como o único gargalo ativo na solução ótima. Em termos práticos, esse valor significa
-que, se a Rentex conseguir disponibilizar mais uma hora de tear por semana (por
-exemplo, via hora extra ou redução de setup), a margem de contribuição total
-aumentará em R\$\,47,06.
-
-A tinturaria, embora com folga de apenas 3,9 horas (praticamente saturada), tem
-preço-sombra nulo nesta solução porque o seu esgotamento não ocorre antes do esgotamento
-dos teares. Contudo, como será mostrado na análise de sensibilidade do Relatório 3,
-a tinturaria se torna gargalo ativo em cenários com capacidade de teares ampliada.
-
-\subsubsection{Análise de Sensibilidade Preliminar -- Capacidade dos Teares}
-
-Para ilustrar o valor informacional da análise de sensibilidade, a
-Tabela~\ref{tab:sens_teares} mostra o impacto de variações na capacidade dos
-teares sobre a margem de contribuição total.
-
-\begin{table}[H]
-\centering
-\caption{Impacto da variação de capacidade dos Teares sobre $Z^*$}
-\label{tab:sens_teares}
-\begin{tabular}{rrrr}
-\toprule
-\textbf{Teares (h)} & \textbf{Variação} & \textbf{$Z^*$ (R\$)} & \textbf{$\Delta Z$ (R\$)} \\
-\midrule
-1.080 & $-100$ h & 57.922,18 & $-4.705,88$ \\
-1.130 & $-50$ h  & 60.275,12 & $-2.352,94$ \\
-1.160 & $-20$ h  & 61.686,88 &   $-941,18$ \\
-\textbf{1.180} & \textbf{(base)} & \textbf{62.628,06} & \textbf{---} \\
-1.200 & $+20$ h  & 62.910,84 &   $+282,78$ \\
-1.230 & $+50$ h  & 62.923,00 &   $+294,94$ \\
-1.280 & $+100$ h & 62.923,00 &   $+294,94$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Dois pontos merecem destaque:
-
-\begin{enumerate}[label=\textbf{(\alph*)}]
-  \item \textbf{Assimetria de impacto:} uma redução de 100 horas nos teares causa
-        uma perda de R\$\,4.706 (proporcionalmente R\$\,47,06/h), enquanto um
-        aumento de 100 horas gera ganho de apenas R\$\,295. Isso ocorre porque,
-        a partir de 1.200 horas de tear (aproximadamente), a tinturaria se torna o
-        novo gargalo ativo, limitando o crescimento do $Z^*$.
-
-  \item \textbf{Limite de validade do preço-sombra:} o preço-sombra de R\$\,47,06/h
-        é válido apenas para variações da capacidade dos teares entre
-        aproximadamente 1.030 h e 1.200 h. Fora desse intervalo, a base ótima muda
-        e o preço-sombra se altera. Esse intervalo será calculado com precisão na
-        análise de sensibilidade completa do Relatório 3.
-\end{enumerate}
-
-\subsubsection{Análise do Ranging dos Coeficientes da Função Objetivo}
-
-Dois produtos foram excluídos da solução ótima (Popeline e Denim). Isso levanta
-a questão: qual seria a margem de contribuição mínima para que cada um deles
-passasse a fazer parte do plano de produção?
-
-\begin{itemize}
-  \item \textbf{Plano Popeline:} atualmente excluído com MC = R\$\,127/lote. A
-        análise computacional mostra que o Popeline entra na solução somente se
-        sua MC for elevada a pelo menos R\$\,140/lote, ou seja, um aumento de
-        R\$\,13/lote (10,2\%) em relação ao valor atual. Essa variação poderia ser
-        obtida por meio de redução de custos de tingimento (o custo de corantes
-        representa cerca de 18\% do CV do Popeline) ou de reajuste de preço de venda.
-
-  \item \textbf{Denim Leve:} atualmente excluído com MC = R\$\,180/lote. Entra
-        na solução apenas se sua MC atingir R\$\,195/lote, um aumento de
-        R\$\,15/lote (8,3\%). Dado que o Denim é o produto com maior consumo de
-        fio e de horas de tear por lote, seu potencial de inclusão no mix depende
-        de negociação mais expressiva de preços de venda com clientes ou de redução
-        no custo do fio de algodão utilizado.
-\end{itemize}
-
-\subsubsection{Comparação com a Abordagem Atual da Empresa}
-
-Com base nas informações coletadas, o plano de produção praticado pela Rentex
-na semana de referência (última semana de março de 2026) foi estimado pela equipe
-de PCP como:
-
-\begin{table}[H]
-\centering
-\caption{Comparação entre o plano atual da Rentex e o plano ótimo do modelo}
-\label{tab:comparacao_planos}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Produto} & \textbf{Plano atual (lotes)} & \textbf{Plano ótimo (lotes)} & \textbf{Diferença} \\
-\midrule
-Malha Jersey    & 160 & 195,0 & $+35,0$ \\
-Malha Rib       & 120 & 148,0 & $+28,0$ \\
-Plano Popeline  &  80 &   0,0 & $-80,0$ \\
-Plano Oxford    &  60 &  82,3 & $+22,3$ \\
-Denim Leve      &  50 &   0,0 & $-50,0$ \\
-Tecido Técnico  &  40 &  58,0 & $+18,0$ \\
-\midrule
-\textbf{MC total (R\$)} & \textbf{52.120,00} & \textbf{62.628,06} & $\mathbf{+10.508,06}$ \\
-\bottomrule
-\multicolumn{4}{l}{\footnotesize MC do plano atual calculada com os mesmos parâmetros do modelo ($\sum \mathrm{MC}_j \cdot x_j^{\text{atual}}$).}
-\end{tabular}
-\end{table}
-
-O plano ótimo gerado pelo modelo representa um ganho de R\$\,10.508,06 por semana
-em relação ao plano praticado pela empresa, correspondendo a uma melhoria de
-\textbf{20,2\%} na margem de contribuição semanal. Extrapolado para 48 semanas
-úteis por ano, esse ganho representa aproximadamente \textbf{R\$\,504.000 anuais}.
-
-A diferença entre os planos se explica principalmente pela ausência de Popeline
-e Denim no plano ótimo: a abordagem atual produz esses itens em quantidades
-significativas, consumindo horas de tear que, no modelo ótimo, são alocadas a
-produtos com maior eficiência em relação ao gargalo (Jersey, Rib, Oxford e
-Técnico).
-
-\newpage
-%==============================================================================
-\subsection{Análise de Integridade -- Modelo PL vs.\ PLI}
-\label{sec:plvspli}
-%==============================================================================
-
-Conforme antecipado no Relatório 1, a solução ótima do modelo de PL contínua
-atribui ao Plano Oxford a quantidade $x_4^* = 82,3$ lotes, valor não inteiro.
-Esta seção avalia se o uso de variáveis inteiras (PLI) altera materialmente o
-resultado.
-
-O modelo de PLI foi resolvido com o mesmo solver CBC, adicionando a restrição
-de integralidade $x_j \in \mathbb{Z}^+$ para todos os produtos. A
-Tabela~\ref{tab:pl_vs_pli} apresenta a comparação.
-
-\begin{table}[H]
-\centering
-\caption{Comparação entre as soluções de PL contínua e PLI}
-\label{tab:pl_vs_pli}
-\begin{tabular}{lrr}
-\toprule
-\textbf{Indicador}               & \textbf{PL contínua} & \textbf{PLI} \\
-\midrule
-$x_1^*$ -- Jersey (lotes)        & 195,0 & 195 \\
-$x_2^*$ -- Rib (lotes)           & 148,0 & 148 \\
-$x_3^*$ -- Popeline (lotes)      &   0,0 &   0 \\
-$x_4^*$ -- Oxford (lotes)        &  82,3 &  82 \\
-$x_5^*$ -- Denim (lotes)         &   0,0 &   0 \\
-$x_6^*$ -- Técnico (lotes)       &  58,0 &  58 \\
-$Z^*$ (R\$/semana)               & 62.628,06 & 62.600,00 \\
-Gap (\%)                         & ---       & $-0{,}04\%$ \\
-Tempo de resolução                & $<$0,01 s & $<$0,01 s \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-A diferença entre as soluções é de apenas R\$\,28,06 (0,04\%), confirmando que
-a hipótese de divisibilidade é adequada para este problema. O arredondamento de
-82,3 para 82 lotes inteiros implica uma perda marginal de R\$\,52,80 (0,3 lote
-$\times$ R\$\,160/lote), parcialmente compensada por R\$\,24,74 de liberação de
-capacidade de teares. O modelo de PL contínua será mantido como referência
-principal, em linha com a justificativa apresentada no Relatório 1.
-
-%==============================================================================
-\subsection{Limitações e Próximas Etapas}
-\label{sec:limitacoes_r2}
-%==============================================================================
-
-Os resultados apresentados neste relatório têm caráter preliminar e estão
-sujeitos às seguintes limitações:
-
-\begin{enumerate}[label=\textbf{(\roman*)}]
-  \item \textbf{Horizonte de planejamento único:} o modelo é estático (horizonte
-        de uma semana) e não captura sazonalidade, variações de demanda ao longo
-        do mês ou efeitos de formação de estoque. A incorporação de múltiplos
-        períodos é possível, mas aumenta significativamente a dimensão do problema.
-
-  \item \textbf{Parâmetros determinísticos:} os coeficientes técnicos, as
-        capacidades e as margens de contribuição são tratados como constantes.
-        Na prática, há variabilidade nos tempos de processo (absenteísmo, quebras
-        de máquina) e nos custos de matéria-prima (oscilação do preço do algodão).
-        A análise de sensibilidade do Relatório 3 quantificará a robustez da
-        solução frente a essas variações.
-
-  \item \textbf{Demanda como limite superior:} o modelo assume que toda unidade
-        produzida será vendida, sem considerar a possibilidade de produção para
-        estoque ou descontos para acelerar a venda de itens menos procurados.
-
-  \item \textbf{Dados de custo do plano atual:} a margem de contribuição do
-        plano atual da Rentex (Tabela~\ref{tab:comparacao_planos}) foi estimada
-        com base em declaração da equipe de PCP e não a partir de um registro
-        formal. No Relatório 3, esse valor será confirmado com dados de sistema.
-\end{enumerate}
-
-O Relatório 3 abordará: (i) análise de sensibilidade completa com intervalos
-exatos de ranging; (ii) interpretação gerencial dos preços-sombra; (iii)
-comparação formal com a metodologia atual a partir de dados de sistema;
-e (iv) recomendações para a gestão da Rentex.
+A Programação Linear contínua foi selecionada como técnica principal porque:
+(i) a função de margem de contribuição é linear no volume produzido; (ii) as
+restrições de capacidade são lineares; (iii) o horizonte semanal valida a hipótese
+de parâmetros estacionários; e (iv) a análise de sensibilidade gerada é de valor
+gerencial imediato para a Rentex. A Programação Linear Inteira será utilizada
+como verificação complementar para confirmar que a hipótese de divisibilidade
+não compromete a solução.
 
 \newpage
