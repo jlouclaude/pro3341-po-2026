@@ -229,3 +229,81 @@ demandas máximas de mercado.
 \end{table}
 
 \newpage
+\subsection{Formulação Matemática Final}
+\label{sec:form_final}
+
+\subsubsection{Notação}
+
+\begin{description}[leftmargin=2.5cm, style=nextline]
+  \item[Índices]
+    $j \in J = \{1, 2, 3, 4\}$: famílias de produto (Barcelos, Joy, Forro Padrão,
+    Forro Premium). \\
+    $i \in I = \{1, 2, 3, 4, 5\}$: recursos (Teares, Fio algodão, Fio poliéster,
+    Elastano, MOD).
+
+  \item[Parâmetros]
+    $\mathrm{MC}_j$ -- margem de contribuição por lote do produto $j$ (R\$/lote). \\
+    $a_{ij}$ -- quantidade do recurso $i$ consumida por lote do produto $j$. \\
+    $b_i$ -- capacidade disponível do recurso $i$ por semana. \\
+    $d_j^{\min}$ -- demanda mínima contratual semanal do produto $j$ (lotes). \\
+    $d_j^{\max}$ -- demanda máxima de mercado semanal do produto $j$ (lotes).
+
+  \item[Variável de decisão]
+    $x_j \geq 0$ -- lotes do produto $j$ a produzir por semana.
+\end{description}
+
+\subsubsection{Modelo de Programação Linear}
+
+\textbf{Função objetivo:}
+\begin{equation}
+  \max \quad Z = \sum_{j \in J} \mathrm{MC}_j \, x_j
+  = 700\,x_1 + 1000\,x_2 + 220\,x_3 + 350\,x_4
+  \label{eq:fo_final}
+\end{equation}
+
+\textbf{Restrições de capacidade de recursos:}
+\begin{align}
+  0{,}85\,x_1 + 1{,}40\,x_2 + 0{,}50\,x_3 + 0{,}70\,x_4 &\leq 380
+    \tag{R1 -- Teares (h)} \label{eq:tear_f}\\[4pt]
+  1{,}35\,x_1 + 0{,}95\,x_2 \phantom{{}+0{,}00x_3+0{,}00x_4} &\leq 400
+    \tag{R2 -- Fio algodão (kg)} \label{eq:alg_f}\\[4pt]
+  0{,}35\,x_2 + 1{,}60\,x_3 + 1{,}55\,x_4 &\leq 500
+    \tag{R3 -- Fio poliéster (kg)} \label{eq:pol_f}\\[4pt]
+  0{,}07\,x_2 \phantom{{}+0{,}00x_3} + 0{,}08\,x_4 &\leq 12
+    \tag{R4 -- Elastano (kg)} \label{eq:ela_f}\\[4pt]
+  0{,}40\,x_1 + 0{,}65\,x_2 + 0{,}25\,x_3 + 0{,}35\,x_4 &\leq 1200
+    \tag{R5 -- MOD (h)} \label{eq:mod_f}
+\end{align}
+
+\textbf{Restrições de demanda:}
+\begin{equation}
+  0 \leq x_1 \leq 200, \quad 0 \leq x_2 \leq 80,
+  \quad 60 \leq x_3 \leq 160, \quad 20 \leq x_4 \leq 60
+  \label{eq:dem_final}
+\end{equation}
+
+O modelo tem \textbf{4 variáveis de decisão}, \textbf{5 restrições de recurso} e
+\textbf{8 restrições de demanda} (4 mínimas contratuais + 4 máximas de mercado).
+
+\subsubsection{Verificação de Não Trivialidade}
+
+O plan de atendimento total da demanda ($x_j = d_j^{\max}$) viola a restrição
+de teares:
+
+\[
+  0{,}85(200) + 1{,}40(80) + 0{,}50(160) + 0{,}70(60)
+  = 170 + 112 + 80 + 42 = \mathbf{404 \; \text{h}} > 380 \; \text{h} \quad \times
+\]
+
+O modelo não tem solução trivial (produzir tudo ao máximo é inviável), o que
+confirma a existência de um trade-off real de alocação de capacidade.
+
+Por outro lado, o plano de mínimos contratuais é viável:
+\[
+  0{,}50(60) + 0{,}70(20) = 30 + 14 = 44 \; \text{h} \ll 380 \; \text{h} \quad \checkmark
+\]
+
+A lacuna entre 44 h (mínimo contratual) e 380 h (capacidade total) é justamente
+o espaço onde o modelo otimiza a alocação entre sarjas e forros adicionais.
+
+\newpage
