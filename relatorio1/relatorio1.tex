@@ -195,3 +195,155 @@ Relatório 2, caso a hipótese de divisibilidade dos lotes se mostre inadequada
 após levantamento de dados com a empresa.
 
 \newpage
+%==============================================================================
+\section{Concepção da Modelagem}
+%==============================================================================
+
+Esta seção apresenta a formulação preliminar do modelo de Programação Linear
+com base nas informações coletadas na visita técnica à Rentex. Os dados
+numéricos utilizados são estimativas de referência, sujeitos a refinamento
+junto à empresa nas próximas etapas do projeto.
+
+\subsection{Conjuntos e Índices}
+
+\begin{itemize}
+  \item $j \in \{1, 2, 3, 4, 5, 6\}$: famílias de produto (Tabela~\ref{tab:produtos}).
+  \item $i \in \{1, 2, 3, 4, 5\}$: recursos produtivos (Tabela~\ref{tab:recursos}).
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Famílias de produto e estimativas de margem de contribuição unitária}
+\label{tab:produtos}
+\begin{tabular}{clccc}
+\toprule
+\textbf{$j$} & \textbf{Produto} & \textbf{Preço (R\$/lote)} & \textbf{CV (R\$/lote)} & \textbf{MC$_j$ (R\$/lote)} \\
+\midrule
+1 & Malha Jersey       & 280 & 180 & 100 \\
+2 & Malha Rib          & 320 & 200 & 120 \\
+3 & Plano Popeline     & 350 & 220 & 130 \\
+4 & Plano Oxford       & 420 & 260 & 160 \\
+5 & Denim Leve         & 480 & 300 & 180 \\
+6 & Tecido Técnico     & 580 & 360 & 220 \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Lote = 100 metros lineares. CV = custos variáveis diretos (fio, corantes, energia).}
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Recursos produtivos e capacidades semanais disponíveis}
+\label{tab:recursos}
+\begin{tabular}{clc}
+\toprule
+\textbf{$i$} & \textbf{Recurso} & \textbf{Capacidade $b_i$} \\
+\midrule
+1 & Teares (h/semana)               & 1.200 h \\
+2 & Tinturaria (h/semana)           & 800 h   \\
+3 & Acabamento (h/semana)           & 600 h   \\
+4 & Matéria-prima -- fio (kg/semana)& 15.000 kg\\
+5 & Mão de obra direta (h/semana)   & 900 h   \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Parâmetros de Consumo de Recursos}
+
+A Tabela~\ref{tab:consumo} apresenta os coeficientes técnicos $a_{ij}$,
+definidos como a quantidade do recurso $i$ consumida por lote do produto $j$.
+Os valores foram estimados com base no roteiro de fabricação fornecido pelo
+setor de engenharia de processos da Rentex e serão validados em levantamento
+de dados na fase seguinte.
+
+\begin{table}[H]
+\centering
+\caption{Consumo de recursos por lote de produto ($a_{ij}$)}
+\label{tab:consumo}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Recurso $i$} & \textbf{Jersey} & \textbf{Rib} & \textbf{Popeline} & \textbf{Oxford} & \textbf{Denim} & \textbf{Técnico} \\
+\midrule
+Teares (h/lote)       & 2,0 & 2,5 & 3,0 & 3,5 & 4,0 & 3,5 \\
+Tinturaria (h/lote)   & 1,5 & 1,5 & 2,0 & 2,5 & 3,0 & 1,0 \\
+Acabamento (h/lote)   & 0,8 & 0,9 & 1,2 & 1,4 & 1,8 & 2,5 \\
+Fio (kg/lote)         & 18  & 22  & 25  & 30  & 35  & 28  \\
+MOD (h/lote)          & 1,2 & 1,5 & 1,8 & 2,0 & 2,5 & 3,0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Limites de Demanda}
+
+Com base na carteira de pedidos histórica e nas projeções comerciais da Rentex,
+os limites de demanda semanal por família de produto são apresentados na
+Tabela~\ref{tab:demanda}.
+
+\begin{table}[H]
+\centering
+\caption{Limites de demanda semanal por produto ($d_j$, em lotes de 100~m)}
+\label{tab:demanda}
+\begin{tabular}{lc}
+\toprule
+\textbf{Produto} & \textbf{Demanda máxima $d_j$ (lotes)} \\
+\midrule
+Malha Jersey    & 200 \\
+Malha Rib       & 150 \\
+Plano Popeline  & 120 \\
+Plano Oxford    & 100 \\
+Denim Leve      &  80 \\
+Tecido Técnico  &  60 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Formulação do Modelo}
+
+Seja $x_j$ a quantidade de lotes do produto $j$ a ser produzida na semana.
+O modelo de Programação Linear é formulado como:
+
+\textbf{Função objetivo:}
+\begin{equation}
+  \text{Maximizar} \quad Z = \sum_{j=1}^{6} \mathrm{MC}_j \, x_j
+  = 100x_1 + 120x_2 + 130x_3 + 160x_4 + 180x_5 + 220x_6
+  \label{eq:fo}
+\end{equation}
+
+\textbf{Sujeito a:}
+
+\noindent Restrições de capacidade de recursos:
+\begin{align}
+  2{,}0\,x_1 + 2{,}5\,x_2 + 3{,}0\,x_3 + 3{,}5\,x_4 + 4{,}0\,x_5 + 3{,}5\,x_6 &\leq 1200 \label{eq:tear}\\
+  1{,}5\,x_1 + 1{,}5\,x_2 + 2{,}0\,x_3 + 2{,}5\,x_4 + 3{,}0\,x_5 + 1{,}0\,x_6 &\leq 800  \label{eq:tint}\\
+  0{,}8\,x_1 + 0{,}9\,x_2 + 1{,}2\,x_3 + 1{,}4\,x_4 + 1{,}8\,x_5 + 2{,}5\,x_6 &\leq 600  \label{eq:acab}\\
+  18\,x_1 + 22\,x_2 + 25\,x_3 + 30\,x_4 + 35\,x_5 + 28\,x_6                    &\leq 15000 \label{eq:fio} \\
+  1{,}2\,x_1 + 1{,}5\,x_2 + 1{,}8\,x_3 + 2{,}0\,x_4 + 2{,}5\,x_5 + 3{,}0\,x_6 &\leq 900  \label{eq:mod}
+\end{align}
+
+\noindent Restrições de demanda:
+\begin{equation}
+  x_j \leq d_j, \quad j = 1, 2, \ldots, 6 \label{eq:dem}
+\end{equation}
+
+\noindent Não negatividade:
+\begin{equation}
+  x_j \geq 0, \quad j = 1, 2, \ldots, 6 \label{eq:nn}
+\end{equation}
+
+O modelo tem \textbf{6 variáveis de decisão} e \textbf{11 restrições funcionais}
+(5 de recurso + 6 de demanda), além das restrições de não negatividade. Esse
+tamanho o torna inviável de resolver graficamente e requer o uso de software de
+otimização, como o método Simplex implementado em Python (PuLP) ou outro solver
+indicado pela disciplina.
+
+\subsection{Identificação de Possíveis Gargalos}
+
+A análise qualitativa do modelo sugere que o recurso de \textbf{acabamento}
+(restrição~\ref{eq:acab}) tende a ser o principal gargalo para o tecido técnico,
+em virtude do coeficiente $a_{3,6} = 2{,}5$ h/lote, o mais alto da coluna.
+Para o denim leve, o consumo de fio ($a_{4,5} = 35$ kg/lote) e de teares
+($a_{1,5} = 4{,}0$ h/lote) são os fatores mais restritivos. Essa análise
+preliminar é consistente com a observação da equipe da Rentex de que os produtos
+de maior margem costumam ter produção limitada por restrições de capacidade,
+o que reforça a necessidade de um modelo formal de otimização.
+
+\newpage
