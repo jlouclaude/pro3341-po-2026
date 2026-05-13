@@ -736,3 +736,82 @@ produtos com maior eficiência em relação ao gargalo (Jersey, Rib, Oxford e
 Técnico).
 
 \newpage
+%==============================================================================
+\subsection{Análise de Integridade -- Modelo PL vs.\ PLI}
+\label{sec:plvspli}
+%==============================================================================
+
+Conforme antecipado no Relatório 1, a solução ótima do modelo de PL contínua
+atribui ao Plano Oxford a quantidade $x_4^* = 82,3$ lotes, valor não inteiro.
+Esta seção avalia se o uso de variáveis inteiras (PLI) altera materialmente o
+resultado.
+
+O modelo de PLI foi resolvido com o mesmo solver CBC, adicionando a restrição
+de integralidade $x_j \in \mathbb{Z}^+$ para todos os produtos. A
+Tabela~\ref{tab:pl_vs_pli} apresenta a comparação.
+
+\begin{table}[H]
+\centering
+\caption{Comparação entre as soluções de PL contínua e PLI}
+\label{tab:pl_vs_pli}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Indicador}               & \textbf{PL contínua} & \textbf{PLI} \\
+\midrule
+$x_1^*$ -- Jersey (lotes)        & 195,0 & 195 \\
+$x_2^*$ -- Rib (lotes)           & 148,0 & 148 \\
+$x_3^*$ -- Popeline (lotes)      &   0,0 &   0 \\
+$x_4^*$ -- Oxford (lotes)        &  82,3 &  82 \\
+$x_5^*$ -- Denim (lotes)         &   0,0 &   0 \\
+$x_6^*$ -- Técnico (lotes)       &  58,0 &  58 \\
+$Z^*$ (R\$/semana)               & 62.628,06 & 62.600,00 \\
+Gap (\%)                         & ---       & $-0{,}04\%$ \\
+Tempo de resolução                & $<$0,01 s & $<$0,01 s \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A diferença entre as soluções é de apenas R\$\,28,06 (0,04\%), confirmando que
+a hipótese de divisibilidade é adequada para este problema. O arredondamento de
+82,3 para 82 lotes inteiros implica uma perda marginal de R\$\,52,80 (0,3 lote
+$\times$ R\$\,160/lote), parcialmente compensada por R\$\,24,74 de liberação de
+capacidade de teares. O modelo de PL contínua será mantido como referência
+principal, em linha com a justificativa apresentada no Relatório 1.
+
+%==============================================================================
+\subsection{Limitações e Próximas Etapas}
+\label{sec:limitacoes_r2}
+%==============================================================================
+
+Os resultados apresentados neste relatório têm caráter preliminar e estão
+sujeitos às seguintes limitações:
+
+\begin{enumerate}[label=\textbf{(\roman*)}]
+  \item \textbf{Horizonte de planejamento único:} o modelo é estático (horizonte
+        de uma semana) e não captura sazonalidade, variações de demanda ao longo
+        do mês ou efeitos de formação de estoque. A incorporação de múltiplos
+        períodos é possível, mas aumenta significativamente a dimensão do problema.
+
+  \item \textbf{Parâmetros determinísticos:} os coeficientes técnicos, as
+        capacidades e as margens de contribuição são tratados como constantes.
+        Na prática, há variabilidade nos tempos de processo (absenteísmo, quebras
+        de máquina) e nos custos de matéria-prima (oscilação do preço do algodão).
+        A análise de sensibilidade do Relatório 3 quantificará a robustez da
+        solução frente a essas variações.
+
+  \item \textbf{Demanda como limite superior:} o modelo assume que toda unidade
+        produzida será vendida, sem considerar a possibilidade de produção para
+        estoque ou descontos para acelerar a venda de itens menos procurados.
+
+  \item \textbf{Dados de custo do plano atual:} a margem de contribuição do
+        plano atual da Rentex (Tabela~\ref{tab:comparacao_planos}) foi estimada
+        com base em declaração da equipe de PCP e não a partir de um registro
+        formal. No Relatório 3, esse valor será confirmado com dados de sistema.
+\end{enumerate}
+
+O Relatório 3 abordará: (i) análise de sensibilidade completa com intervalos
+exatos de ranging; (ii) interpretação gerencial dos preços-sombra; (iii)
+comparação formal com a metodologia atual a partir de dados de sistema;
+e (iv) recomendações para a gestão da Rentex.
+
+\newpage
