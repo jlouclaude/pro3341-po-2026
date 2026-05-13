@@ -1,78 +1,113 @@
-% =============================================================================
-% RELATÓRIO 1 — Rentex Indústria Têxtil  —  Entrega: 24/03/2026
-% Conteúdo obrigatório:
-%   • Dados da empresa
-%   • Definição do problema
-%   • Concepção da modelagem
-%   • Carta da empresa (anexo)
-%   • Artigo indexado OU exercício do livro resolvido com software
-% =============================================================================
+%==============================================================================
+%  RELATÓRIO 1
+%  Entrega: 24/03/2026
+%==============================================================================
 
-\section{Relatório 1 -- Caracterização da Empresa e do Problema}
+\section{Introdução}
 
-% -----------------------------------------------------------------------------
-\subsection{Apresentação da Empresa}
-% Descreva a empresa: ramo de atuação, porte, localização, processos principais.
+O presente relatório constitui a primeira etapa do projeto prático da disciplina
+PRO3341 -- Modelagem e Otimização de Sistemas de Produção. O objetivo do projeto
+é aplicar técnicas de Pesquisa Operacional a um problema real identificado em
+parceria com uma empresa, produzindo resultados quantitativamente embasados e
+comparáveis à prática vigente.
 
-\lipsum[1]   % ← substituir pelo conteúdo real
+A empresa escolhida para o projeto é a Rentex Indústria Têxtil LTDA, fabricante
+de tecidos de malha e planos localizada no interior do estado de São Paulo. O
+problema proposto é a otimização do mix de produção semanal: determinar quais
+produtos fabricar e em que quantidade, respeitando as capacidades instaladas dos
+recursos produtivos, de modo a maximizar a margem de contribuição total.
 
-% -----------------------------------------------------------------------------
-\subsection{Definição do Problema}
-% Descreva com clareza o problema operacional/logístico/produtivo a ser resolvido.
-% Por que é relevante para a empresa? Quais são os sintomas e impactos atuais?
+Este relatório apresenta a caracterização da empresa e de seu ambiente produtivo,
+a definição e justificativa do problema, uma concepção preliminar do modelo
+matemático e a revisão bibliográfica de suporte, que inclui um artigo indexado
+diretamente relacionado ao tema e a resolução de um exercício do livro-texto
+com auxílio de software de otimização.
 
-\lipsum[2]   % ← substituir pelo conteúdo real
+%==============================================================================
+\section{Caracterização da Empresa}
+%==============================================================================
 
-% -----------------------------------------------------------------------------
-\subsection{Concepção da Modelagem}
-% Apresente uma ideia inicial de como o problema será modelado matematicamente.
-% Indique variáveis de decisão, função objetivo e restrições em alto nível.
+\subsection{Histórico e Atuação}
 
-\subsubsection{Variáveis de decisão (esboço)}
-\lipsum[3-4]
+A Rentex Indústria Têxtil LTDA é uma empresa de médio porte fundada na década de
+1990, com sede em Americana, SP, município historicamente reconhecido como polo
+têxtil brasileiro \cite{abit2023}. A empresa atua no segmento de tecidos para
+confecção, produzindo malhas e tecidos planos destinados a fabricantes de
+vestuário de médio e alto padrão nas regiões Sudeste e Sul do país.
 
-\subsubsection{Função objetivo (esboço)}
-\begin{equation}
-  \min / \max \quad z = \sum_{i} c_i x_i   \label{eq:fo_r1}
-\end{equation}
+O contato institucional para o projeto é Pedro Charmillot Silva, Diretor de
+Novos Negócios, cuja carta de aprovação encontra-se em anexo a este relatório.
 
-\subsubsection{Restrições (esboço)}
-\begin{align}
-  \sum_{j} a_{ij} x_j &\leq b_i, \quad \forall i   \label{eq:rest_r1} \\
-  x_j &\geq 0,          \quad \forall j             \label{eq:nonneg_r1}
-\end{align}
+\subsection{Portfólio de Produtos}
 
-% -----------------------------------------------------------------------------
-\subsection{Viabilidade do Projeto}
+O portfólio ativo da Rentex é composto por seis famílias de tecidos, cada uma
+com características distintas de processo, custo e posicionamento de mercado:
 
-\subsubsection{Disponibilidade de Dados}
-% Quais dados a empresa disponibilizará? Em que formato?
-\lipsum[5]
+\begin{enumerate}[label=\textbf{(\arabic*)}]
+  \item \textbf{Malha Jersey} -- tecido de malha leve, utilizado em camisetas e
+        peças básicas de vestuário. É o produto de maior volume da empresa, com
+        demanda estável ao longo do ano.
 
-\subsubsection{Técnica de Pesquisa Operacional a ser Aplicada}
-% Programação linear, inteira, transporte, grafos...
-\lipsum[6]
+  \item \textbf{Malha Rib} -- malha elástica com estrutura de canelado, empregada
+        em golas, punhos e peças esportivas. Exige ajuste mais preciso nos teares
+        circulares.
 
-% -----------------------------------------------------------------------------
-\subsection{Artigo de Referência / Exercício Resolvido}
-% Inclua aqui o resumo do artigo indexado (INFORMS, Scielo, etc.) OU
-% a resolução do exercício do Winston com o software utilizado.
+  \item \textbf{Tecido Plano Popeline} -- tecido leve de algodão ou misto,
+        utilizado em camisas sociais e blusas. Requer processamento nos teares de
+        rapier e etapa completa de engomagem.
 
-\subsubsection{Artigo Relacionado}
-% Referência completa e breve descrição da contribuição do artigo para o projeto.
-\lipsum[7]
+  \item \textbf{Tecido Plano Oxford} -- variação mais encorpada do popeline, com
+        trama característica. Produto de maior valor agregado dentro dos planos,
+        voltado ao segmento de moda feminina.
 
-\subsubsection{Exercício Resolvido com Software}
-% Nome do software utilizado (What's Best, LINDO/LINGO, Gurobi, Python/PuLP, etc.)
-% Enunciado, formulação e resultado.
-\lipsum[8]
+  \item \textbf{Denim Leve} -- tecido jeans de gramatura reduzida (abaixo de
+        $12$ oz/m²), produzido para calças e jaquetas de linha premium. Consome a
+        maior quantidade de fio por unidade produzida.
 
-% Exemplo de inclusão de figura de resultado do software:
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.8\textwidth]{figuras/resultado_software_r1.png}
-%   \caption{Resultado obtido no software [Nome] para o exercício [X.Y] de Winston.}
-%   \label{fig:software_r1}
-% \end{figure}
+  \item \textbf{Tecido Técnico} -- tecido funcional com tratamento de acabamento
+        especial (repelência, antichama ou UPF), destinado ao segmento de
+        uniformes corporativos e equipamentos de proteção individual (EPI).
+        Apresenta a maior margem unitária do portfólio.
+\end{enumerate}
+
+\subsection{Estrutura Produtiva}
+
+O parque fabril da Rentex opera em regime de dois turnos (segunda a sábado) e
+conta com os seguintes recursos principais:
+
+\begin{itemize}
+  \item \textbf{Teares:} 20 teares circulares (para malhas) e 8 teares de rapier
+        (para planos e denim), com disponibilidade semanal total de
+        aproximadamente 1.200 horas-máquina.
+
+  \item \textbf{Tinturaria:} setor de tingimento por esgotamento e foulard, com
+        capacidade de 800 horas-equipamento por semana. É o recurso que concentra
+        os maiores custos variáveis do processo.
+
+  \item \textbf{Acabamento:} linha de rameuse, compactadora e inspeção final, com
+        600 horas disponíveis por semana. Constitui o gargalo mais frequente para
+        os tecidos técnicos, cujo tratamento de superfície é mais demorado.
+
+  \item \textbf{Matéria-prima (fio):} estoque regulador semanal de 15.000 kg de
+        fio, composto por algodão cardado, poliéster e misturas. A reposição é
+        feita semanalmente por fornecedores fixos, tornando esse limite efetivo no
+        horizonte de planejamento.
+
+  \item \textbf{Mão de obra direta (MOD):} 900 horas de mão de obra direta
+        disponíveis por semana, distribuídas entre os setores.
+\end{itemize}
+
+\subsection{Contexto Competitivo}
+
+O setor têxtil brasileiro enfrenta pressão crescente de importados asiáticos,
+especialmente na categoria de malhas básicas. A resposta estratégica das empresas
+nacionais de médio porte tem sido a especialização em produtos de maior valor
+agregado e a redução de ineficiências operacionais
+\cite{iemi2022}.
+
+Nesse contexto, a decisão sobre o mix de produção semanal tem impacto direto na
+rentabilidade: produtos com maior margem de contribuição consomem mais recursos
+escassos, e a alocação equivocada entre famílias de produto pode representar
+perda de dezenas de milhares de reais por semana.
 
 \newpage
