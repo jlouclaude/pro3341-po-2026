@@ -120,3 +120,112 @@ como verificação complementar para confirmar que a hipótese de divisibilidade
 não compromete a solução.
 
 \newpage
+\subsection{Coleta e Validação dos Dados}
+
+Os dados foram coletados em levantamento conduzido junto ao PCP da Rentex em
+abril de 2026. As fontes utilizadas foram: (i) roteiros de fabricação com tempos
+padrão por operação, extraídos do software de gestão da empresa; (ii) relatórios
+mensais de capacidade dos doze meses anteriores; (iii) fichas de custo de produto
+com discriminação de matéria-prima e mão de obra direta; e (iv) histórico de
+pedidos dos últimos seis meses para calibrar os limites de demanda.
+
+\subsubsection{Capacidades Semanais Disponíveis}
+
+A Rentex opera com 5 teares planos em regime de dois turnos (segunda a sábado),
+com um quadro de 30 funcionários. A Tabela~\ref{tab:cap_r2} apresenta as
+capacidades brutas e as disponibilidades efetivas calculadas após desconto de
+manutenção preventiva, absenteísmo e paradas não programadas.
+
+\begin{table}[H]
+\centering
+\caption{Capacidades semanais disponíveis validadas}
+\label{tab:cap_r2}
+\begin{tabular}{clrrc}
+\toprule
+\textbf{$i$} & \textbf{Recurso} & \textbf{Bruto} & \textbf{Eficiência} & \textbf{$b_i$ utilizado} \\
+\midrule
+1 & Teares (h/semana)               & 448 h    & 84,8\% & \textbf{380 h}     \\
+2 & Fio de algodão (kg/semana)      & 400 kg   & 100\%  & \textbf{400 kg}    \\
+3 & Fio de poliéster (kg/semana)    & 500 kg   & 100\%  & \textbf{500 kg}    \\
+4 & Elastano (kg/semana)            & 12 kg    & 100\%  & \textbf{12 kg}     \\
+5 & Mão de obra direta (h/semana)   & 1.440 h  & 83,3\% & \textbf{1.200 h}   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Bruto dos teares = 5 teares $\times$ 2 turnos $\times$ 8 h $\times$ 5,6 dias úteis médios.}\\
+\multicolumn{5}{l}{\footnotesize Elastano: limite definido por capacidade do almoxarifado (produto de alto custo e baixo giro).}
+\end{tabular}
+\end{table}
+
+\subsubsection{Produtos e Margens de Contribuição}
+
+A Tabela~\ref{tab:mc_r2} apresenta os preços de venda e as margens de
+contribuição dos quatro produtos, calculadas com base nas fichas de custo
+de março de 2026.
+
+\begin{table}[H]
+\centering
+\caption{Preços, custos variáveis e margens de contribuição por lote (100~m)}
+\label{tab:mc_r2}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{$j$} & \textbf{Produto} & \textbf{Preço (R\$/lote)} & \textbf{CV (R\$/lote)} & \textbf{MC$_j$ (R\$/lote)} \\
+\midrule
+1 & Sarja Barcelos (100\% algodão)     & 1.800 & 1.100 &  \textbf{700} \\
+2 & Sarja Joy (mista pol./elastano)    & 2.400 & 1.400 & \textbf{1.000} \\
+3 & Forro Poliéster Padrão             &   600 &   380 &  \textbf{220} \\
+4 & Forro Poliéster Premium            &   900 &   550 &  \textbf{350} \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize CV = fios + corantes + energia + mão de obra direta variável.}
+\end{tabular}
+\end{table}
+
+\subsubsection{Coeficientes Técnicos}
+
+A Tabela~\ref{tab:coef_r2} apresenta os coeficientes $a_{ij}$, validados por
+cronometragem em linha durante visita técnica. Os coeficientes de tear incorporam
+o tempo de setup amortizado conforme a equação~\eqref{eq:setup}, usando como
+tamanho mínimo de lote 50 metros para a Sarja Barcelos e 80 metros para a Sarja
+Joy (limites estabelecidos nos contratos de fornecimento).
+
+\begin{table}[H]
+\centering
+\caption{Coeficientes técnicos $a_{ij}$: consumo de recurso $i$ por lote do produto $j$}
+\label{tab:coef_r2}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Recurso $i$} & \textbf{S.\ Barcelos} & \textbf{S.\ Joy} & \textbf{F.\ Padrão} & \textbf{F.\ Premium} \\
+\midrule
+Teares (h/lote) -- incl.\ setup  & 0,85 & 1,40 & 0,50 & 0,70 \\
+Fio algodão (kg/lote)            & 1,35 & 0,95 & 0,00 & 0,00 \\
+Fio poliéster (kg/lote)          & 0,00 & 0,35 & 1,60 & 1,55 \\
+Elastano (kg/lote)               & 0,00 & 0,07 & 0,00 & 0,08 \\
+Mão de obra direta (h/lote)      & 0,40 & 0,65 & 0,25 & 0,35 \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Setup amortizado na Sarja Joy: $S_j = 0{,}5$ h por troca, lote mínimo de 80~m.}
+\end{tabular}
+\end{table}
+
+\subsubsection{Limites de Demanda}
+
+Os limites de demanda foram calibrados a partir do histórico de pedidos e dos
+contratos firmados com clientes. A Tabela~\ref{tab:dem_r2} apresenta os valores
+utilizados, distinguindo as demandas mínimas contratuais (obrigatórias) das
+demandas máximas de mercado.
+
+\begin{table}[H]
+\centering
+\caption{Limites de demanda semanal ($d_j^{\min}$ e $d_j^{\max}$, em lotes de 100~m)}
+\label{tab:dem_r2}
+\begin{tabular}{llccl}
+\toprule
+\textbf{$j$} & \textbf{Produto} & \textbf{$d_j^{\min}$} & \textbf{$d_j^{\max}$} & \textbf{Observação} \\
+\midrule
+1 & Sarja Barcelos   &   0 & 200 & Demanda de mercado apenas \\
+2 & Sarja Joy        &   0 &  80 & Demanda de mercado apenas \\
+3 & Forro Padrão     &  60 & 160 & Mínimo contratual com 3 clientes \\
+4 & Forro Premium    &  20 &  60 & Mínimo contratual com 1 cliente \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
