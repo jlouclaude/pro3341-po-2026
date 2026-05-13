@@ -1,5 +1,4 @@
 \documentclass[12pt, a4paper]{article}
-
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[brazil]{babel}
@@ -14,8 +13,6 @@
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{caption}
-\usepackage{subcaption}
-\usepackage{longtable}
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{pgffor}
@@ -40,43 +37,23 @@
   keywordstyle=\color{codekw}\bfseries,
   commentstyle=\color{codecomment}\itshape,
   stringstyle=\color{codestring},
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  numbersep=8pt,
-  frame=single,
-  rulecolor=\color{gray!40},
-  breaklines=true,
-  captionpos=b,
-  showstringspaces=false,
-  tabsize=4,
-  inputencoding=utf8,
-  extendedchars=true,
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=8pt,
+  frame=single, rulecolor=\color{gray!40},
+  breaklines=true, captionpos=b, showstringspaces=false, tabsize=4,
+  inputencoding=utf8, extendedchars=true,
   literate=
-    {á}{{\'a}}1 {ã}{{\~a}}1 {â}{{\^a}}1 {à}{{\`a}}1
-    {é}{{\'e}}1 {ê}{{\^e}}1 {í}{{\'i}}1
-    {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
-    {ú}{{\'u}}1 {ü}{{\"u}}1 {ç}{{\c{c}}}1
-    {Á}{{\'A}}1 {Ã}{{\~A}}1 {É}{{\'E}}1 {Ê}{{\^E}}1
-    {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ô}{{\^O}}1
-    {Ú}{{\'U}}1 {Ç}{{\c{C}}}1,
+    {á}{{\'a}}1 {ã}{{\~a}}1 {â}{{\^a}}1 {é}{{\'e}}1 {ê}{{\^e}}1
+    {í}{{\'i}}1 {ó}{{\'o}}1 {õ}{{\~o}}1 {ô}{{\^o}}1
+    {ú}{{\'u}}1 {ç}{{\c{c}}}1 {Á}{{\'A}}1 {Ã}{{\~A}}1
+    {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1 {Ç}{{\c{C}}}1,
 }
 
 \begin{document}
-
 \input{capa}
 \tableofcontents
 \newpage
-
 \input{relatorio1/relatorio1}
-
 \clearpage
-\appendix
-\renewcommand{\thesection}{\Alph{section}}
-
-\clearpage
-\setcounter{section}{0}
 \input{relatorio2/relatorio2}
-
 \printbibliography[heading=bibintoc, title={Referências}]
-
 \end{document}
